@@ -6,22 +6,27 @@ JupyterLab spreadsheet editor provides interactive comma/tab separated value spr
 
 **Fully featured integration**
 toolbar with row/column operations & column width adjustment; search and replace functions.
+
 ![](screenshots/setosa-demo.gif)
 
 **Formula support**
 basic formula calculation (rendering) - as implemented by jExcel.
+
 ![](screenshots/formula-support.gif)
 
 **Column freezing**
 for exploration of wide datasets with many covariates
+
 ![](screenshots/freeze-support.gif)
 
+
 **Launcher items**
-Easily create CSV/TSV files from the launcher or the palette.
+create CSV/TSV files easily from the launcher or the palette.
+
 ![](screenshots/launcher.png)
 
 **Lightweight and reliable dependencies**
-The spreadsheet interface is built with the [jexcel v4](https://github.com/paulhodel/jexcel), while [Papa Parse](https://github.com/mholt/PapaParse) provides very fast, [RFC 4180](https://tools.ietf.org/html/rfc4180) compatible CSV parsing (both have no third-party dependencies).
+the spreadsheet interface is built with the [jexcel v4](https://github.com/paulhodel/jexcel), while [Papa Parse](https://github.com/mholt/PapaParse) provides very fast, [RFC 4180](https://tools.ietf.org/html/rfc4180) compatible CSV parsing (both have no third-party dependencies).
 
 ## Requirements
 
@@ -72,3 +77,8 @@ jupyter lab --watch
 
 jupyter labextension uninstall spreadsheet-editor
 ```
+
+## Related extensions
+
+- [jupyterlab-spreadsheet](https://github.com/quigleyj97/jupyterlab-spreadsheet) implements Excel spreadsheet viewer
+- the built-in [csvviewer](https://github.com/jupyterlab/jupyterlab/tree/master/packages/csvviewer) ([extension](https://github.com/jupyterlab/jupyterlab/tree/master/packages/csvviewer-extension)) allows to display CSV/TSV files
