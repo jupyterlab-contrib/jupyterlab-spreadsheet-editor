@@ -1,11 +1,15 @@
 {
   "name": "spreadsheet-editor",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "JupyterLab spreadsheet (csv/tsv) editor",
   "keywords": [
     "jupyter",
     "jupyterlab",
-    "jupyterlab-extension"
+    "jupyterlab-extension",
+    "csv",
+    "tsv",
+    "spreadsheeet",
+    "excel"
   ],
   "homepage": "https://github.com/krassowski/jupyterlab-spreadsheet-editor",
   "bugs": {
