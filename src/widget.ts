@@ -87,8 +87,19 @@ export class SpreadsheetWidget extends Widget {
     // Wire signal connections.
     contextModel.contentChanged.connect(this._onContentChanged, this);
 
+    // If the sheet is not too big, use the more user-friendly columns width adjustment model
+    if (data.length && data[0].length * data.length < 100 * 100) {
+      this.fitMode = 'fit-cells';
+      this.relayout()
+    }
+
     // Resolve the ready promise.
     this._ready.resolve(undefined);
+  }
+
+  protected onAfterShow(msg: Message) {
+    super.onAfterShow(msg);
+    this.relayout()
   }
 
   get ready(): Promise<void> {
