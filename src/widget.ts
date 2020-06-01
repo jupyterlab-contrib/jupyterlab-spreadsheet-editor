@@ -220,9 +220,7 @@ export class SpreadsheetWidget extends Widget {
           let header = this.jexcel.getHeader(i);
           for (let j = 0; j < data.length; j++) {
             let cell = this.jexcel.getCell(header + (j + 1)) as HTMLElement;
-            cell.style.display = 'inline';
-            maxColumnWidth = Math.max(maxColumnWidth, cell.offsetWidth);
-            cell.style.display = null;
+            maxColumnWidth = Math.max(maxColumnWidth, cell.scrollWidth);
           }
           this.jexcel.setWidth(i, maxColumnWidth, null);
         }
