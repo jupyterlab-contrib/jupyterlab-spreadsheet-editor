@@ -1,11 +1,14 @@
 # JupyterLab Spreadsheet Editor
 
-JupyterLab spreadsheet editor provides interactive comma/tab separated value spreadsheets edition with support for formulas, sorting, column/row rearrangements and more!
+JupyterLab spreadsheet editor enables interactive editing of comma/tab separated value spreadsheets.
+It support formulas, sorting, column/row rearrangements and more!
 
 ## Showcase
 
 **Fully featured integration**
-toolbar with row/column operations & column width adjustment; search and replace functions.
+
+- row/column operations, column width adjustment
+- search and replace
 
 ![](screenshots/setosa-demo.gif)
 
@@ -20,13 +23,13 @@ for exploration of wide datasets with many covariates
 ![](screenshots/freeze-support.gif)
 
 
-**Launcher items**
+**Launcher items**:
 create CSV/TSV files easily from the launcher or the palette.
 
 ![](screenshots/launcher.png)
 
-**Lightweight and reliable dependencies**
-the spreadsheet interface is built with the [jexcel v4](https://github.com/paulhodel/jexcel), while [Papa Parse](https://github.com/mholt/PapaParse) provides very fast, [RFC 4180](https://tools.ietf.org/html/rfc4180) compatible CSV parsing (both have no third-party dependencies).
+**Lightweight and reliable dependencies**:
+the spreadsheet interface is built with the [jexcel](https://github.com/paulhodel/jexcel), while [Papa Parse](https://github.com/mholt/PapaParse) provides very fast, [RFC 4180](https://tools.ietf.org/html/rfc4180) compatible CSV parsing (both have no third-party dependencies).
 
 ## Requirements
 
@@ -80,5 +83,11 @@ jupyter labextension uninstall spreadsheet-editor
 
 ## Related extensions
 
+Spreadsheet viewers:
+
 - [jupyterlab-spreadsheet](https://github.com/quigleyj97/jupyterlab-spreadsheet) implements Excel spreadsheet viewer
 - the built-in [csvviewer](https://github.com/jupyterlab/jupyterlab/tree/master/packages/csvviewer) ([extension](https://github.com/jupyterlab/jupyterlab/tree/master/packages/csvviewer-extension)) allows to display CSV/TSV files
+
+In-notebook spreadsheet widgets:
+- [ipysheet](https://github.com/QuantStack/ipysheet) - programmable sheet creation, exploration and modification
+- [qgrid](https://github.com/quantopian/qgrid) - interactive DataFrame exploration and modification
