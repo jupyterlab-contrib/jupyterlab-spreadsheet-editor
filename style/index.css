@@ -15,8 +15,11 @@ table.jexcel {
     padding: 0;
 }
 
-/* use https://bossanova.uk/jexcel/v4/cases/themes tool to adjust */
+/**
+Dark theme
+ */
 body[data-jp-theme-light='false'] .jexcel_container {
+    /* use https://bossanova.uk/jexcel/v4/cases/themes tool to adjust */
     --jexcel_header_color: #ccc;
     --jexcel_header_color_highlighted: #ddd;
     --jexcel_header_background: #313131;
@@ -35,6 +38,13 @@ body[data-jp-theme-light='false'] .jexcel_container {
     --active_color: #eee;
 }
 
+body[data-jp-theme-light='false'] .se-backlight {
+    background: rgba(85, 45, 0, 0.75);
+}
+
+/**
+Light theme
+ */
 body[data-jp-theme-light='true'] .jexcel_container {
     --jexcel_header_color: #000;
     --jexcel_header_color_highlighted: #000;
@@ -52,4 +62,8 @@ body[data-jp-theme-light='true'] .jexcel_container {
     --jexcel_border_color: #ccc;
     --jexcel_border_color_highlighted: #000;
     --active_color: #007aff;
+}
+
+body[data-jp-theme-light='true'] .se-backlight {
+    background: rgba(255, 255, 0, 0.75);
 }

@@ -9,6 +9,11 @@ import { SpreadsheetWidget } from "./widget";
 import { ISignal, Signal } from "@lumino/signaling";
 import { JExcelElement } from "jexcel";
 
+interface ICellCoordinates {
+  column: number;
+  row: number;
+}
+
 export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEditorDocumentWidget> {
   /**
    * Report whether or not this provider has the ability to search on the given object
@@ -36,20 +41,46 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
   };
 
   endQuery(): Promise<void> {
+    this.backlightOff();
     this._currentMatchIndex = null;
     return Promise.resolve(undefined);
   }
 
-  async endSearch(): Promise<void> {
-    //return Promise.resolve(undefined);
+  private backlightOff() {
+    for (let match_cell_id of this.backlitMatches.values()) {
+      let cell: HTMLElement = this._target.getCell(match_cell_id)
+      cell.classList.remove('se-backlight');
+    }
+    this.backlitMatches.clear();
   }
 
-  getInitialQuery(searchTarget: SpreadsheetEditorDocumentWidget): any {
-    let target = searchTarget.content.jexcel
+  async endSearch(): Promise<void> {
+    //return Promise.resolve(undefined);
+    return this.endQuery()
+  }
+
+  private getSelectedCellCoordinates(): ICellCoordinates {
+    let target = this._target
     let columns = target.getSelectedColumns()
     let rows = target.getSelectedRows(true)
     if (rows.length == 1 && columns.length == 1) {
-      let value = target.getValueFromCoords(columns[0], rows[0], false);
+      return {
+        column: columns[0],
+        row: rows[0]
+      }
+    }
+  }
+
+  private _initialQueryCoodrs: ICellCoordinates;
+
+  getInitialQuery(searchTarget: SpreadsheetEditorDocumentWidget): any {
+    this._target = searchTarget.content.jexcel;
+    let coords = this.getSelectedCellCoordinates();
+    this._initialQueryCoodrs = coords;
+    if (coords) {
+      let value = this._target.getValueFromCoords(
+        coords.column, coords.row, false
+      );
       if (value) {
         return value
       }
@@ -86,24 +117,32 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
   }
 
   highlight(match: ISearchMatch) {
+    this.backlightMatches();
     this._target.updateSelectionFromCoords(match.column, match.line, match.column, match.line, null);
+    let cell = this._target.getCellFromCoords(match.column, match.line)
+    cell.scrollIntoView(false);
   }
 
   async replaceAllMatches(newText: string): Promise<boolean> {
     for (let i = 0; i < this.matches.length; i++) {
       this._currentMatchIndex = i
-      await this.replaceCurrentMatch(newText);
+      await this.replaceCurrentMatch(newText, true);
     }
+    this._matches = this.findMatches();
+    this.backlightMatches();
     return true;
   }
 
-  async replaceCurrentMatch(newText: string): Promise<boolean> {
+  async replaceCurrentMatch(newText: string, isReplaceAll=false): Promise<boolean> {
     let replaceOccurred = false;
     let match = this.matches[this.currentMatchIndex]
     let cell = this._target.getValueFromCoords(match.column, match.line, false);
     let index = -1;
+    let matchesInCell = 0;
+
     let newValue = String(cell).replace(this._query, (substring) => {
       index += 1;
+      matchesInCell += 1;
       if (index == match.index) {
         replaceOccurred = true;
         return newText;
@@ -124,24 +163,62 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
 
     this._target.setValueFromCoords(match.column, match.line, newValue, false);
 
-    await this.highlightNext();
+    if (!isReplaceAll && matchesInCell == 1) {
+      let match_cell_id = this._target.getHeader(match.column) + (match.line + 1)
+      let cell: HTMLElement = this._target.getCell(match_cell_id)
+      cell.classList.remove('se-backlight');
+      this.backlitMatches.delete(match_cell_id)
+    }
+
+    if(!isReplaceAll) {
+      await this.highlightNext();
+    }
     return replaceOccurred;
   }
 
   private _onSheetChanged() {
-    this.findMatches();
+    this._matches = this.findMatches();
+    this.backlightMatches();
     this._changed.emit(undefined);
   }
 
+  protected backlitMatches: Set<string>;
+
+  /**
+   * Highlight n=1000 matches around the current match.
+   * The number of highlights is limited to prevent negative impact on the UX in huge notebooks.
+   */
+  protected backlightMatches(n=1000): void {
+    for (
+      let i = Math.max(0, this._currentMatchIndex - n / 2);
+      i < Math.min(this._currentMatchIndex + n / 2, this.matches.length);
+      i++
+    ) {
+      let match = this.matches[i];
+      let match_cell_id = this._target.getHeader(match.column) + (match.line + 1)
+
+      if (!this.backlitMatches.has(match_cell_id)) {
+        let cell: HTMLElement = this._target.getCell(match_cell_id)
+        cell.classList.add('se-backlight');
+        this.backlitMatches.add(match_cell_id)
+      }
+    }
+  }
+
   protected findMatches(): ISearchMatch[] {
+    let currentCellCoordinates = this._initialQueryCoodrs;
+    this._initialQueryCoodrs = null;
+    let currentMatchIndex = 0;
+
     let matches: ISearchMatch[] = [];
     let data = this._target.getData();
-    let row_number = 0;
-    let column_number = -1;
+    let rowNumber = 0;
+    let columnNumber = -1;
     let index = 0;
+    let totalMatchIndex = 0;
     for (let row of data) {
       for (let cell of row) {
-        column_number += 1;
+        columnNumber += 1;
         if (!cell) {
           continue;
         }
@@ -150,32 +227,47 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
           continue;
         }
         index = 0;
+        if (
+          currentCellCoordinates != null
+          && currentCellCoordinates.row == rowNumber
+          && currentCellCoordinates.column == columnNumber
+        ) {
+          currentMatchIndex = totalMatchIndex;
+          console.log('hit!', totalMatchIndex)
+        }
         for (let match of matched) {
           matches.push({
-            line: row_number,
-            column: column_number,
+            line: rowNumber,
+            column: columnNumber,
             index: index,
             fragment: match,
             text: match
           })
-
           index += 1;
+          totalMatchIndex += 1;
         }
       }
-      column_number = -1;
-      row_number += 1;
+      columnNumber = -1;
+      rowNumber += 1;
     }
-    this._currentMatchIndex = 0;
+    this._currentMatchIndex = currentMatchIndex;
     this._matches = matches;
 
+    if (matches.length) {
+      this.highlight(matches[this._currentMatchIndex]);
+    }
+
     return matches
+  }
+
+  constructor() {
+    this.backlitMatches = new Set<string>();
   }
 
   async startQuery(query: RegExp, searchTarget: SpreadsheetEditorDocumentWidget): Promise<ISearchMatch[]> {
     if (!SpreadsheetSearchProvider.canSearchOn(searchTarget)) {
       throw new Error('Cannot find Spreadsheet editor instance to search');
     }
-
     this._sheet = searchTarget.content;
     this._query = query;
     this._target = searchTarget.content.jexcel;
