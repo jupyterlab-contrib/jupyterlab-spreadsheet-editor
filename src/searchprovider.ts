@@ -43,6 +43,8 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
   endQuery(): Promise<void> {
     this.backlightOff();
     this._currentMatchIndex = null;
+    this._matches = [];
+    this._sheet.changed.disconnect(this._onSheetChanged, this)
     return Promise.resolve(undefined);
   }
 
@@ -233,7 +235,6 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
           && currentCellCoordinates.column == columnNumber
         ) {
           currentMatchIndex = totalMatchIndex;
-          console.log('hit!', totalMatchIndex)
         }
         for (let match of matched) {
           matches.push({
@@ -274,7 +275,7 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
     this._target.resetSelection(true);
     this._target.el.blur();
 
-    this._sheet.changed.connect(() => { this._onSheetChanged() })
+    this._sheet.changed.connect(this._onSheetChanged, this)
 
     return this.findMatches();
   }
