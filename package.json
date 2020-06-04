@@ -57,13 +57,11 @@
     "@types/jexcel": "^3.9.1",
     "@types/papaparse": "^5.0.3",
     "jexcel": "^4.2.0",
-    "papaparse": "^5.2.0",
-    "watchpack-chokidar2": "^2.0.0"
+    "papaparse": "^5.2.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^2.25.0",
     "@typescript-eslint/parser": "^2.25.0",
-    "chokidar": "^3.4.0",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.10.1",
     "eslint-plugin-prettier": "^3.1.2",
