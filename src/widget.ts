@@ -80,6 +80,12 @@ export class SpreadsheetWidget extends Widget {
       onchange: () => {
         this.context.model.value.text = this.getValue();
         this.changed.emit();
+      },
+      oninsertcolumn: () => {
+        this.onResize();
+      },
+      ondeletecolumn: () => {
+        this.onResize();
       }
     };
     this.jexcel = jexcel(this.node as HTMLDivElement, options);
