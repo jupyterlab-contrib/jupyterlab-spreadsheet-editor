@@ -10,6 +10,18 @@ import { Message } from "@lumino/messaging";
 import jexcel from "jexcel";
 import { Signal } from "@lumino/signaling";
 
+type columnTypeId = 'autocomplete'
+  | 'calendar'
+  | 'checkbox'
+  | 'color'
+  | 'dropdown'
+  | 'hidden'
+  | 'html'
+  | 'image'
+  | 'numeric'
+  | 'radio'
+  | 'text';
+
 /**
  * An spreadsheet widget.
  */
@@ -23,6 +35,13 @@ export class SpreadsheetWidget extends Widget {
   public fitMode: 'all-equal-default' | 'all-equal-fit' | 'fit-cells';
   public changed: Signal<this, void>
   protected hasFrozenColumns: boolean;
+  private editor: HTMLDivElement;
+  private columnTypesBar: HTMLDivElement;
+  private selectAllElement: HTMLElement;
+
+  protected firstRowAsHeader: boolean;
+  private header: Array<string>;
+  private columnTypes: Array<columnTypeId>;
 
   constructor(context: DocumentRegistry.CodeContext) {
     super();
@@ -39,6 +58,7 @@ export class SpreadsheetWidget extends Widget {
       this.separator = ','
     }
     this.hasFrozenColumns = false;
+    this.firstRowAsHeader = false;
 
     context.ready.then(() => {
       this._onContextReady();
@@ -47,7 +67,7 @@ export class SpreadsheetWidget extends Widget {
   }
 
   protected parseValue(content: string): jexcel.CellValue[][] {
-    let parsed = Papa.parse(content, {'delimiter': this.separator})
+    let parsed = Papa.parse(content, {delimiter: this.separator})
     if (!this.separator) {
       this.separator = parsed.meta.delimiter;
     }
@@ -55,7 +75,39 @@ export class SpreadsheetWidget extends Widget {
     if (parsed.errors.length) {
       console.warn('Parsing errors encountered', parsed.errors)
     }
+    let columns_n = this.extractColumnNumber(parsed.data);
+    // TODO: read the actual type from a file?
+    // TODO only redefine if reading for the first time?
+    // TODO add/remove when column added removed?
+    if (typeof this.columnTypes === "undefined") {
+      this.columnTypes = [...Array(columns_n).map(() => 'text' as columnTypeId)]
+    }
+
+    if (this.firstRowAsHeader) {
+      this.header = parsed.data.shift();
+    } else {
+      this.header = null;
+    }
+
     return parsed.data;
+  }
+
+  extractColumnNumber(data: jexcel.CellValue[][]): number {
+    return data.length ? data[0].length : 0
+  }
+
+  columns(columns_n: number) {
+
+    let columns: Array<jexcel.Column> = [];
+
+    for (let i = 0; i < columns_n; i++) {
+      columns.push({
+        title: this.header ? this.header[i] : null,
+        type: this.columnTypes[i]
+      })
+
+    }
+    return columns
   }
 
   private _onContextReady(): void {
@@ -82,16 +134,39 @@ export class SpreadsheetWidget extends Widget {
         this.changed.emit();
       },
       oninsertcolumn: () => {
+        this.populateColumnTypesBar();
         this.onResize();
       },
       ondeletecolumn: () => {
+        this.populateColumnTypesBar();
         this.onResize();
-      }
+      },
+      onresizecolumn: () => {
+        this.adjustColumnTypesWidth();
+      },
+      columns: this.columns(this.extractColumnNumber(data))
     };
-    this.jexcel = jexcel(this.node as HTMLDivElement, options);
+
+    const container = document.createElement('div');
+    container.className = 'se-area-container'
+    this.node.appendChild(container);
+
+    // TODO: move to a separate class/widget
+    this.columnTypesBar = document.createElement('div');
+    this.columnTypesBar.classList.add('se-column-types')
+    this.columnTypesBar.classList.add('se-hidden')
+    this.columnTypeSelectors = new Map();
+    container.appendChild(this.columnTypesBar);
+
+    this.editor = document.createElement('div');
+    container.appendChild(this.editor)
+
+    this.createEditor(options);
 
     // Wire signal connections.
     contextModel.contentChanged.connect(this._onContentChanged, this);
+
+    this.populateColumnTypesBar();
 
     // If the sheet is not too big, use the more user-friendly columns width adjustment model
     if (data.length && data[0].length * data.length < 100 * 100) {
@@ -101,6 +176,88 @@ export class SpreadsheetWidget extends Widget {
 
     // Resolve the ready promise.
     this._ready.resolve(undefined);
+  }
+
+  reloadEditor(options: jexcel.Options) {
+    let config = this.jexcel.getConfig();
+    this.jexcel.destroy();
+    this.createEditor({
+      ...config,
+      ...options
+    })
+    this.relayout();
+  }
+
+  switchHeaders() {
+    let value = this.getValue();
+    this.firstRowAsHeader = !this.firstRowAsHeader;
+    let data = this.parseValue(value);
+    this.reloadEditor(
+      {
+        data: data,
+        columns: this.columns(this.extractColumnNumber(data))
+      }
+    )
+  }
+
+
+  switchTypesBar() {
+    this.columnTypesBar.classList.toggle('se-hidden')
+  }
+
+  columnTypeSelectors: Map<number, HTMLSelectElement>
+
+  protected populateColumnTypesBar() {
+    // TODO: interface with name, id, options callback?
+    const options = [
+      'text',
+      'numeric',
+      'hidden',
+      'dropdown',
+      'autocomplete',
+      'checkbox',
+      'radio',
+      'calendar',
+      'image',
+      'color',
+      'html'
+    ]
+    this.columnTypesBar.innerHTML = '';
+    this.columnTypeSelectors.clear();
+    for (let columnId = 0; columnId < this.columns_n; columnId++) {
+      // TODO react widget
+      let columnTypeSelector = document.createElement("select")
+      for (let option of options) {
+        let optionElement = document.createElement("option")
+        optionElement.value = option;
+        optionElement.text = option;
+        columnTypeSelector.appendChild(optionElement)
+      }
+      columnTypeSelector.onchange = (ev) => {
+        let select = ev.target as HTMLSelectElement;
+        this.columnTypes[columnId] = select.options[select.selectedIndex].value as columnTypeId;
+        this.reloadEditor({columns: this.columns(this.columnTypes.length)})
+
+      };
+      this.columnTypeSelectors.set(columnId, columnTypeSelector);
+      this.columnTypesBar.appendChild(columnTypeSelector);
+    }
+  }
+
+  protected adjustColumnTypesWidth() {
+    if (this.columnTypeSelectors.size == 0) {
+      return
+    }
+    this.columnTypesBar.style.marginLeft = this.selectAllElement.offsetWidth + 'px';
+    let widths = this.jexcel.getWidth(null);
+    for (let columnId = 0; columnId < this.columns_n; columnId++) {
+      this.columnTypeSelectors.get(columnId).style.width = widths[columnId] + 'px';
+    }
+  }
+
+  protected createEditor(options: jexcel.Options) {
+    this.jexcel = jexcel(this.editor, options);
+    this.selectAllElement = this.jexcel.headerContainer.querySelector('.jexcel_selectall');
   }
 
   protected onAfterShow(msg: Message) {
@@ -114,6 +271,9 @@ export class SpreadsheetWidget extends Widget {
 
   getValue(): string {
     let data = this.jexcel.getData();
+    if (this.firstRowAsHeader) {
+      data.unshift(this.jexcel.getHeaders(true))
+    }
     return Papa.unparse(
       data,
       {
@@ -124,7 +284,8 @@ export class SpreadsheetWidget extends Widget {
   }
 
   setValue(value: string) {
-    this.jexcel.setData(this.parseValue(value));
+    let parsed = this.parseValue(value);
+    this.jexcel.setData(parsed);
   }
 
   private _onContentChanged(): void {
@@ -149,6 +310,7 @@ export class SpreadsheetWidget extends Widget {
         this.node.querySelector('.jexcel_content') as HTMLElement
       ).offsetHeight + 'px'
     }
+    this.adjustColumnTypesWidth();
   }
 
   protected onActivateRequest(msg: Message): void {
@@ -169,12 +331,9 @@ export class SpreadsheetWidget extends Widget {
 
   freezeSelectedColumns() {
     let columns = this.jexcel.getSelectedColumns()
-    let config = this.jexcel.getConfig();
-    this.jexcel.destroy();
-    this.jexcel = jexcel(
-      this.node as HTMLDivElement,
+    this.reloadEditor(
       {
-        ...config,
+        // @ts-ignore
         freezeColumns: Math.max(...columns) + 1,
         tableOverflow: true,
         tableWidth: this.node.offsetWidth + 'px',
@@ -185,12 +344,9 @@ export class SpreadsheetWidget extends Widget {
   }
 
   unfreezeColumns() {
-    let config = this.jexcel.getConfig();
-    this.jexcel.destroy();
-    this.jexcel = jexcel(
-      this.node as HTMLDivElement,
+    this.reloadEditor(
       {
-        ...config,
+        // @ts-ignore
         freezeColumns: null,
         tableOverflow: false,
         tableWidth: null,
@@ -200,7 +356,7 @@ export class SpreadsheetWidget extends Widget {
     this.hasFrozenColumns = false;
   }
 
-  get columns(): number {
+  get columns_n(): number {
     let data = this.jexcel.getData();
     if (!data.length) {
       return;
@@ -208,8 +364,22 @@ export class SpreadsheetWidget extends Widget {
     return data[0].length;
   }
 
+  getHeaderElements() {
+    let headers = [];
+    for (let element of this.jexcel.headerContainer.children) {
+      // TODO use data attribute?
+      if (element.className != 'jexcel_selectall') {
+        headers.push(element)
+      }
+    }
+    return headers;
+  }
+
   relayout() {
-    let columns = this.columns;
+    if (typeof this.jexcel === 'undefined') {
+      return
+    }
+    let columns = this.columns_n;
 
     if (!columns) {
       return;
@@ -232,17 +402,18 @@ export class SpreadsheetWidget extends Widget {
         break;
       case "fit-cells":
         let data = this.jexcel.getData();
+        let headers = this.getHeaderElements();
         for (let i = 0; i < columns; i++) {
-          let maxColumnWidth = 25;
-          let header = this.jexcel.getHeader(i);
+          let maxColumnWidth = Math.max(25, headers[i].scrollWidth);
           for (let j = 0; j < data.length; j++) {
-            let cell = this.jexcel.getCell(header + (j + 1)) as HTMLElement;
+            let cell = this.jexcel.getCellFromCoords(i, j) as HTMLElement;
             maxColumnWidth = Math.max(maxColumnWidth, cell.scrollWidth);
           }
           this.jexcel.setWidth(i, maxColumnWidth, null);
         }
         break;
     }
+    this.adjustColumnTypesWidth();
   }
 
   context: DocumentRegistry.CodeContext;

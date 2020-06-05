@@ -7,12 +7,35 @@ table.jexcel {
 }
 
 .jexcel_container {
-    overflow: auto;
+    overflow: visible;
     padding: 0;
 }
 
 .jexcel_content {
     padding: 0;
+}
+
+.se-area-container {
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+}
+
+.se-column-types {
+    width: max-content;
+    height: var(--jp-private-toolbar-height);
+}
+
+.se-column-types select{
+    display: inline-block;
+}
+
+.se-hidden {
+    display: none;
+}
+
+svg[data-icon="spreadsheet:column-types"]  {
+    transform: rotate(90deg);
 }
 
 /**

@@ -13,6 +13,8 @@ import numberedSvg from "../style/icons/mdi-format-list-numbered.svg";
 import fitColumnWidthSvg from "../style/icons/mdi-table-column-width.svg"
 import freezeColumnSvg from "../style/icons/mdi-snowflake.svg"
 import unfreezeColumnSvg from "../style/icons/mdi-snowflake-off.svg"
+import listTypeSvg from "../style/icons/mdi-format-list-bulleted-type.svg"
+import topHeaderSvg from "../style/icons/mdi-page-layout-header.svg"
 
 export class SpreadsheetEditorDocumentWidget extends DocumentWidget<SpreadsheetWidget> {
   constructor(options: DocumentWidget.IOptions<SpreadsheetWidget>) {
@@ -50,7 +52,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<SpreadsheetW
     let removeColumnButton = new ToolbarButton({
       icon: new LabIcon({name: 'spreadsheet:remove-column', svgstr: removeColumnSvg}),
       onClick: () => {
-        this.content.jexcel.deleteColumn(this.content.columns, null);
+        this.content.jexcel.deleteColumn(this.content.columns_n, null);
         this.content.updateModel();
       },
       tooltip: 'Remove the last column'
@@ -109,5 +111,24 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<SpreadsheetW
       tooltip: 'Unfreeze frozen column'
     });
     this.toolbar.addItem('spreadsheet:unfreeze-columns', unfreezeColumnButton)
+
+
+    let switchHeadersButton = new ToolbarButton({
+      icon: new LabIcon({name: 'spreadsheet:switch-headers', svgstr: topHeaderSvg}),
+      onClick: () => {
+        this.content.switchHeaders();
+      },
+      tooltip: 'First row as a header'
+    });
+    this.toolbar.addItem('spreadsheet:switch-headers', switchHeadersButton)
+
+    let columnTypeButton = new ToolbarButton({
+      icon: new LabIcon({name: 'spreadsheet:column-types', svgstr: listTypeSvg}),
+      onClick: () => {
+        this.content.switchTypesBar();
+      },
+      tooltip: 'Show/hide column types bar'
+    });
+    this.toolbar.addItem('spreadsheet:switch-column-types-bar', columnTypeButton)
   }
 }
