@@ -14,6 +14,84 @@ interface ICellCoordinates {
   row: number;
 }
 
+class CoordinatesSet {
+
+  protected _set: Set<string>;
+
+  constructor() {
+    this._set = new Set<string>();
+  }
+
+  protected _valueToString(value: ICellCoordinates): string {
+    if (typeof value == 'undefined'){
+      return value
+    }
+    return value.column + '|' + value.row;
+  }
+
+  protected _stringToValue(value: string): ICellCoordinates {
+    if (typeof value == 'undefined'){
+      return value
+    }
+    let parts = value.split('|');
+    if (parts.length != 2) {
+      console.warn('A problem with stringToValue input detected!')
+    }
+    return {
+      column: parseInt(parts[0], 10),
+      row: parseInt(parts[1], 10)
+    }
+  }
+
+  add(value: ICellCoordinates): this {
+    this._set.add(this._valueToString(value));
+    return this;
+  }
+
+  delete(value: ICellCoordinates): boolean {
+    return this._set.delete(this._valueToString(value));
+  }
+
+  has(value: ICellCoordinates): boolean {
+    return this._set.has(this._valueToString(value));
+  }
+
+  values(): IterableIterator<ICellCoordinates> {
+    let iterator = this._set.values();
+    let stringToValue = this._stringToValue
+    return {
+      [Symbol.iterator](): IterableIterator<ICellCoordinates> {
+        return this;
+      },
+      return(value: any): IteratorResult<ICellCoordinates> {
+        let returned = iterator.return(value)
+        return {
+          done: returned.done,
+          value: stringToValue(returned.value)
+        };
+      },
+      next() {
+        let next = iterator.next()
+        return {
+          done: next.done,
+          value: stringToValue(next.value)
+        }
+      },
+      throw() {
+        let thrown = iterator.throw()
+        return {
+          done: thrown.done,
+          value: stringToValue(thrown.value)
+        }
+      }
+    }
+  }
+
+  clear() {
+    return this._set.clear();
+  }
+}
+
 export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEditorDocumentWidget> {
   /**
    * Report whether or not this provider has the ability to search on the given object
@@ -49,8 +127,8 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
   }
 
   private backlightOff() {
-    for (let match_cell_id of this.backlitMatches.values()) {
-      let cell: HTMLElement = this._target.getCell(match_cell_id)
+    for (let matchCoords of this.backlitMatches.values()) {
+      let cell: HTMLElement = this._target.getCellFromCoords(matchCoords.column, matchCoords.row)
       cell.classList.remove('se-backlight');
     }
     this.backlitMatches.clear();
@@ -166,10 +244,10 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
     this._target.setValueFromCoords(match.column, match.line, newValue, false);
 
     if (!isReplaceAll && matchesInCell == 1) {
-      let match_cell_id = this._target.getHeader(match.column) + (match.line + 1)
-      let cell: HTMLElement = this._target.getCell(match_cell_id)
+      let matchCoords = {column: match.column, row: match.line};
+      let cell: HTMLElement = this._target.getCellFromCoords(match.column, match.line)
       cell.classList.remove('se-backlight');
-      this.backlitMatches.delete(match_cell_id)
+      this.backlitMatches.delete(matchCoords)
     }
 
     if(!isReplaceAll) {
@@ -184,7 +262,7 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
     this._changed.emit(undefined);
   }
 
-  protected backlitMatches: Set<string>;
+  protected backlitMatches: CoordinatesSet;
 
   /**
    * Highlight n=1000 matches around the current match.
@@ -197,12 +275,15 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
       i++
     ) {
       let match = this.matches[i];
-      let match_cell_id = this._target.getHeader(match.column) + (match.line + 1)
+      let matchCoord = {
+        column: match.column,
+        row: match.line
+      }
 
-      if (!this.backlitMatches.has(match_cell_id)) {
-        let cell: HTMLElement = this._target.getCell(match_cell_id)
+      if (!this.backlitMatches.has(matchCoord)) {
+        let cell: HTMLElement = this._target.getCellFromCoords(match.column, match.line)
         cell.classList.add('se-backlight');
-        this.backlitMatches.add(match_cell_id)
+        this.backlitMatches.add(matchCoord)
       }
     }
   }
@@ -262,7 +343,7 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
   }
 
   constructor() {
-    this.backlitMatches = new Set<string>();
+    this.backlitMatches = new CoordinatesSet();
   }
 
   async startQuery(query: RegExp, searchTarget: SpreadsheetEditorDocumentWidget): Promise<ISearchMatch[]> {
