@@ -62,7 +62,7 @@ export class SpreadsheetWidget extends Widget {
 
     context.ready.then(() => {
       this._onContextReady();
-    });
+    }).catch(console.warn);
     this.changed = new Signal<this, void>(this);
   }
 
@@ -386,13 +386,14 @@ export class SpreadsheetWidget extends Widget {
     }
     
     switch (this.fitMode) {
-      case "all-equal-default":
+      case "all-equal-default": {
         let options = this.jexcel.getConfig();
         for (let i = 0; i < columns; i++) {
           this.jexcel.setWidth(i, options.defaultColWidth, null);
         }
         break;
-      case "all-equal-fit":
+      }
+      case "all-equal-fit": {
         let indexColumn = this.node.querySelector('.jexcel_selectall') as HTMLElement
         let availableWidth = this.node.clientWidth - indexColumn.offsetWidth;
         let widthPerColumn = availableWidth / columns;
@@ -400,7 +401,8 @@ export class SpreadsheetWidget extends Widget {
           this.jexcel.setWidth(i, widthPerColumn, null);
         }
         break;
-      case "fit-cells":
+      }
+      case "fit-cells": {
         let data = this.jexcel.getData();
         let headers = this.getHeaderElements();
         for (let i = 0; i < columns; i++) {
@@ -412,6 +414,7 @@ export class SpreadsheetWidget extends Widget {
           this.jexcel.setWidth(i, maxColumnWidth, null);
         }
         break;
+      }
     }
     this.adjustColumnTypesWidth();
   }

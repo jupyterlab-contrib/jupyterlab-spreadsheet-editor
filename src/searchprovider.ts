@@ -110,13 +110,13 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
 
   get currentMatchIndex() {
     return this._currentMatchIndex;
-  };
+  }
 
   readonly isReadOnly: boolean;
 
   get matches(): ISearchMatch[] {
     return this._matches;
-  };
+  }
 
   endQuery(): Promise<void> {
     this.backlightOff();
