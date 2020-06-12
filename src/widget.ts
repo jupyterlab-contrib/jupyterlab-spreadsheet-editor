@@ -203,7 +203,6 @@ export class SpreadsheetWidget extends Widget {
     )
   }
 
-
   switchTypesBar() {
     this.columnTypesBar.classList.toggle('se-hidden')
   }

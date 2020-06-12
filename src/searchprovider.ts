@@ -198,7 +198,10 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
 
   highlight(match: ISearchMatch) {
     this.backlightMatches();
+    // select the matched cell, which leads to a loss of "focus" (or rather jexcel eagerly intercepting events)
     this._target.updateSelectionFromCoords(match.column, match.line, match.column, match.line, null);
+    // "regain" focus by erasing selection information (but keeping all the CSS) - this is a workaround (best avoided)
+    this._target.selectedCell = null
     this._sheet.scrollCellIntoView(match)
   }
 
