@@ -104,6 +104,8 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
     );
   }
 
+  private mostRecentSelectedCell: any;
+
   get changed(): ISignal<this, void> {
     return this._changed;
   }
@@ -135,7 +137,10 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
   }
 
   async endSearch(): Promise<void> {
-    //return Promise.resolve(undefined);
+    // restore the selection
+    if(this._target.selectedCell == null && this.mostRecentSelectedCell) {
+      this._target.selectedCell = this.mostRecentSelectedCell;
+    }
     return this.endQuery()
   }
 
@@ -201,6 +206,7 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
     // select the matched cell, which leads to a loss of "focus" (or rather jexcel eagerly intercepting events)
     this._target.updateSelectionFromCoords(match.column, match.line, match.column, match.line, null);
     // "regain" focus by erasing selection information (but keeping all the CSS) - this is a workaround (best avoided)
+    this.mostRecentSelectedCell = this._target.selectedCell;
     this._target.selectedCell = null
     this._sheet.scrollCellIntoView(match)
   }
