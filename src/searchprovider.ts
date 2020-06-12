@@ -259,7 +259,7 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
   }
 
   private _onSheetChanged() {
-    this._matches = this.findMatches();
+    this._matches = this.findMatches(false);
     this.backlightMatches();
     this._changed.emit(undefined);
   }
@@ -290,7 +290,7 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
     }
   }
 
-  protected findMatches(): ISearchMatch[] {
+  protected findMatches(highlightFirst=true): ISearchMatch[] {
     let currentCellCoordinates = this._initialQueryCoodrs;
     this._initialQueryCoodrs = null;
     let currentMatchIndex = 0;
@@ -337,7 +337,7 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
     this._currentMatchIndex = currentMatchIndex;
     this._matches = matches;
 
-    if (matches.length) {
+    if (matches.length && highlightFirst) {
       this.highlight(matches[this._currentMatchIndex]);
     }
 
