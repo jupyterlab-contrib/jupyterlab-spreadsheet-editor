@@ -9,6 +9,7 @@ import Papa from "papaparse";
 import { Message } from "@lumino/messaging";
 import jexcel from "jexcel";
 import { Signal } from "@lumino/signaling";
+import { ISearchMatch } from "@jupyterlab/documentsearch";
 
 type columnTypeId = 'autocomplete'
   | 'calendar'
@@ -36,6 +37,7 @@ export class SpreadsheetWidget extends Widget {
   public changed: Signal<this, void>
   protected hasFrozenColumns: boolean;
   private editor: HTMLDivElement;
+  private container: HTMLDivElement;
   private columnTypesBar: HTMLDivElement;
   private selectAllElement: HTMLElement;
 
@@ -160,6 +162,7 @@ export class SpreadsheetWidget extends Widget {
 
     this.editor = document.createElement('div');
     container.appendChild(this.editor)
+    this.container = container;
 
     this.createEditor(options);
 
@@ -297,6 +300,13 @@ export class SpreadsheetWidget extends Widget {
     }
   }
 
+  get wrapper() {
+    if (this.hasFrozenColumns) {
+      return this.jexcel.content;
+    }
+    return this.container;
+  }
+
   onResize() {
     if (typeof this.jexcel === 'undefined') {
       return
@@ -421,4 +431,18 @@ export class SpreadsheetWidget extends Widget {
 
   context: DocumentRegistry.CodeContext;
   private _ready = new PromiseDelegate<void>();
+
+  scrollCellIntoView(match: ISearchMatch) {
+    let cell = this.jexcel.getCellFromCoords(match.column, match.line)
+    let cellRect = cell.getBoundingClientRect();
+    let wrapperRect = this.wrapper.getBoundingClientRect();
+    let alignToTop = false;
+
+    if (cellRect.top < wrapperRect.top) {
+      alignToTop = true;
+    }
+    if (alignToTop || cellRect.bottom > wrapperRect.bottom || cellRect.left < wrapperRect.left || cellRect.right > wrapperRect.right) {
+      cell.scrollIntoView(alignToTop);
+    }
+  }
 }

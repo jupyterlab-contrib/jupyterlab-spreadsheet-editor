@@ -199,8 +199,7 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
   highlight(match: ISearchMatch) {
     this.backlightMatches();
     this._target.updateSelectionFromCoords(match.column, match.line, match.column, match.line, null);
-    let cell = this._target.getCellFromCoords(match.column, match.line)
-    cell.scrollIntoView(false);
+    this._sheet.scrollCellIntoView(match)
   }
 
   async replaceAllMatches(newText: string): Promise<boolean> {
