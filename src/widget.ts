@@ -9,7 +9,7 @@ import Papa from "papaparse";
 import { Message } from "@lumino/messaging";
 import jexcel from "jexcel";
 import { Signal } from "@lumino/signaling";
-import { ISearchMatch } from "@jupyterlab/documentsearch";
+import { ICellCoordinates } from "./searchprovider";
 
 type columnTypeId = 'autocomplete'
   | 'calendar'
@@ -145,6 +145,10 @@ export class SpreadsheetWidget extends Widget {
       },
       onresizecolumn: () => {
         this.adjustColumnTypesWidth();
+      },
+      onselection: (el: HTMLElement, borderLeft: number, borderTop: number, borderRight: number, borderBottom: number, origin: any) => {
+        // TODO: support all corners of selection
+        this.scrollCellIntoView({column: borderLeft, row: borderTop})
       },
       columns: this.columns(this.extractColumnNumber(data))
     };
@@ -431,16 +435,23 @@ export class SpreadsheetWidget extends Widget {
   context: DocumentRegistry.CodeContext;
   private _ready = new PromiseDelegate<void>();
 
-  scrollCellIntoView(match: ISearchMatch) {
-    let cell = this.jexcel.getCellFromCoords(match.column, match.line)
+  scrollCellIntoView(match: ICellCoordinates) {
+    let cell = this.jexcel.getCellFromCoords(match.column, match.row)
     let cellRect = cell.getBoundingClientRect();
     let wrapperRect = this.wrapper.getBoundingClientRect();
     let alignToTop = false;
+    let softMargin = 3;
 
-    if (cellRect.top < wrapperRect.top) {
+    if (cellRect.right > wrapperRect.right) {
+      this.wrapper.scrollBy(cellRect.right - wrapperRect.right, 0)
+    } else if (cellRect.left < wrapperRect.left) {
+      this.wrapper.scrollBy(cellRect.left - wrapperRect.left, 0)
+    }
+
+    if (cellRect.top - softMargin < wrapperRect.top) {
       alignToTop = true;
     }
-    if (alignToTop || cellRect.bottom > wrapperRect.bottom || cellRect.left < wrapperRect.left || cellRect.right > wrapperRect.right) {
+    if (alignToTop || cellRect.bottom + softMargin > wrapperRect.bottom) {
       cell.scrollIntoView(alignToTop);
     }
   }

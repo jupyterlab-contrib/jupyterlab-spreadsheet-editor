@@ -9,7 +9,7 @@ import { SpreadsheetWidget } from "./widget";
 import { ISignal, Signal } from "@lumino/signaling";
 import { JExcelElement } from "jexcel";
 
-interface ICellCoordinates {
+export interface ICellCoordinates {
   column: number;
   row: number;
 }
@@ -208,7 +208,7 @@ export class SpreadsheetSearchProvider implements ISearchProvider<SpreadsheetEdi
     // "regain" focus by erasing selection information (but keeping all the CSS) - this is a workaround (best avoided)
     this.mostRecentSelectedCell = this._target.selectedCell;
     this._target.selectedCell = null
-    this._sheet.scrollCellIntoView(match)
+    this._sheet.scrollCellIntoView({row: match.line, column: match.column})
   }
 
   async replaceAllMatches(newText: string): Promise<boolean> {
