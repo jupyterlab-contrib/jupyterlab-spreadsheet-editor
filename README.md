@@ -83,6 +83,9 @@ jupyter labextension uninstall spreadsheet-editor
 
 ## Related extensions
 
+Spreadsheet editors:
+- [jupyterlab-tabular-data-editor](https://github.com/jupytercalpoly/jupyterlab-tabular-data-editor)
+
 Spreadsheet viewers:
 
 - [jupyterlab-spreadsheet](https://github.com/quigleyj97/jupyterlab-spreadsheet) implements Excel spreadsheet viewer
