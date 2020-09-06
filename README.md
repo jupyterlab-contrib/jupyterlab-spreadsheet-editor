@@ -3,6 +3,8 @@
 JupyterLab spreadsheet editor enables interactive editing of comma/tab separated value spreadsheets.
 It support formulas, sorting, column/row rearrangements and more!
 
+> Note: unless you need formula and/or column/row freeze support you probably want to use a newer extension: [tabular-data-editor](https://github.com/jupytercalpoly/jupyterlab-tabular-data-editor)
+
 ## Showcase
 
 **Fully featured integration**
