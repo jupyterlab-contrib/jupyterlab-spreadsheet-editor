@@ -98,3 +98,7 @@ Spreadsheet viewers:
 
 - [jupyterlab-spreadsheet](https://github.com/quigleyj97/jupyterlab-spreadsheet) implements Excel spreadsheet viewer
 - the built-in [csvviewer](https://github.com/jupyterlab/jupyterlab/tree/master/packages/csvviewer) ([extension](https://github.com/jupyterlab/jupyterlab/tree/master/packages/csvviewer-extension)) allows to display CSV/TSV files
+
+In-notebook spreadsheet widgets:
+- [ipysheet](https://github.com/QuantStack/ipysheet) - programmable sheet creation, exploration and modification
+- [qgrid](https://github.com/quantopian/qgrid) - interactive DataFrame exploration and modification
