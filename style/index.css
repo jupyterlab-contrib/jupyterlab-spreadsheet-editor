@@ -1,92 +1,92 @@
-@import "~jexcel/dist/jexcel.css";
-@import "~jexcel/dist/jexcel.theme.css";
+@import '~jexcel/dist/jexcel.css';
+@import '~jexcel/dist/jexcel.theme.css';
 
 table.jexcel {
-    border-top: 0;
-    border-left: 0;
+  border-top: 0;
+  border-left: 0;
 }
 
 .jexcel_container {
-    overflow: visible;
-    padding: 0;
+  overflow: visible;
+  padding: 0;
 }
 
 .jexcel_content {
-    padding: 0;
+  padding: 0;
 }
 
 .se-area-container {
-    overflow: auto;
-    width: 100%;
-    height: 100%;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
 }
 
 .se-column-types {
-    width: max-content;
-    height: var(--jp-private-toolbar-height);
+  width: max-content;
+  height: var(--jp-private-toolbar-height);
 }
 
-.se-column-types select{
-    display: inline-block;
+.se-column-types select {
+  display: inline-block;
 }
 
 .se-hidden {
-    display: none;
+  display: none;
 }
 
-svg[data-icon="spreadsheet:column-types"]  {
-    transform: rotate(90deg);
+svg[data-icon='spreadsheet:column-types'] {
+  transform: rotate(90deg);
 }
 
 /**
 Dark theme
  */
 body[data-jp-theme-light='false'] .jexcel_container {
-    /* use https://bossanova.uk/jexcel/v4/cases/themes tool to adjust */
-    --jexcel_header_color: #ccc;
-    --jexcel_header_color_highlighted: #ddd;
-    --jexcel_header_background: #313131;
-    --jexcel_header_background_highlighted: #777;
-    --jexcel_content_color: #fff;
-    --jexcel_content_color_highlighted: #333;
-    --jexcel_content_background: #111;
-    --jexcel_content_background_highlighted: #333;
-    --jexcel_menu_background: #7e7e7e;
-    --jexcel_menu_background_highlighted: #ebebeb;
-    --jexcel_menu_color: #ddd;
-    --jexcel_menu_color_highlighted: #222;
-    --jexcel_menu_box_shadow: unset;
-    --jexcel_border_color: #5f5f5f;
-    --jexcel_border_color_highlighted: #999;
-    --active_color: #eee;
+  /* use https://bossanova.uk/jexcel/v4/cases/themes tool to adjust */
+  --jexcel_header_color: #ccc;
+  --jexcel_header_color_highlighted: #ddd;
+  --jexcel_header_background: #313131;
+  --jexcel_header_background_highlighted: #777;
+  --jexcel_content_color: #fff;
+  --jexcel_content_color_highlighted: #333;
+  --jexcel_content_background: #111;
+  --jexcel_content_background_highlighted: #333;
+  --jexcel_menu_background: #7e7e7e;
+  --jexcel_menu_background_highlighted: #ebebeb;
+  --jexcel_menu_color: #ddd;
+  --jexcel_menu_color_highlighted: #222;
+  --jexcel_menu_box_shadow: unset;
+  --jexcel_border_color: #5f5f5f;
+  --jexcel_border_color_highlighted: #999;
+  --active_color: #eee;
 }
 
 body[data-jp-theme-light='false'] .se-backlight {
-    background: rgba(85, 45, 0, 0.75);
+  background: rgba(85, 45, 0, 0.75);
 }
 
 /**
 Light theme
  */
 body[data-jp-theme-light='true'] .jexcel_container {
-    --jexcel_header_color: #000;
-    --jexcel_header_color_highlighted: #000;
-    --jexcel_header_background: #f3f3f3;
-    --jexcel_header_background_highlighted: #dcdcdc;
-    --jexcel_content_color: #000;
-    --jexcel_content_color_highlighted: #000;
-    --jexcel_content_background: #fff;
-    --jexcel_content_background_highlighted: rgba(0,0,0,0.05);
-    --jexcel_menu_background: #fff;
-    --jexcel_menu_background_highlighted: #ebebeb;
-    --jexcel_menu_color: #555;
-    --jexcel_menu_color_highlighted: #555;
-    --jexcel_menu_box_shadow: 2px 2px 2px 0px rgba(143, 144, 145, 1);
-    --jexcel_border_color: #ccc;
-    --jexcel_border_color_highlighted: #000;
-    --active_color: #007aff;
+  --jexcel_header_color: #000;
+  --jexcel_header_color_highlighted: #000;
+  --jexcel_header_background: #f3f3f3;
+  --jexcel_header_background_highlighted: #dcdcdc;
+  --jexcel_content_color: #000;
+  --jexcel_content_color_highlighted: #000;
+  --jexcel_content_background: #fff;
+  --jexcel_content_background_highlighted: rgba(0, 0, 0, 0.05);
+  --jexcel_menu_background: #fff;
+  --jexcel_menu_background_highlighted: #ebebeb;
+  --jexcel_menu_color: #555;
+  --jexcel_menu_color_highlighted: #555;
+  --jexcel_menu_box_shadow: 2px 2px 2px 0px rgba(143, 144, 145, 1);
+  --jexcel_border_color: #ccc;
+  --jexcel_border_color_highlighted: #000;
+  --active_color: #007aff;
 }
 
 body[data-jp-theme-light='true'] .se-backlight {
-    background: rgba(255, 255, 0, 0.75);
+  background: rgba(255, 255, 0, 0.75);
 }

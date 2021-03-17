@@ -16,11 +16,12 @@
     "url": "https://github.com/krassowski/jupyterlab-spreadsheet-editor/issues"
   },
   "license": "BSD-3-Clause",
-  "author": "Michał Krassowski",
+  "author": "Micha\u0142 Krassowski",
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
     "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}",
-    "style/icons/**/*.{svg}"
+    "style/icons/**/*.{svg}",
+    "style/index.js"
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -30,52 +31,67 @@
     "url": "https://github.com/krassowski/jupyterlab-spreadsheet-editor.git"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "build": "jlpm run build:lib && jlpm run build:labextension:dev",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:lib": "tsc",
+    "build:prod": "jlpm run build:lib && jlpm run build:labextension",
+    "clean": "jlpm run clean:lib",
+    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
+    "clean:labextension": "rimraf spreadsheet-editor/labextension",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "eslint": "eslint . --ext .ts,.tsx --fix",
     "eslint:check": "eslint . --ext .ts,.tsx",
+    "install:extension": "jupyter labextension develop --overwrite .",
+    "prepare": "jlpm run clean && jlpm run build:prod",
     "prettier": "prettier --write \"**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}\"",
     "prettier:check": "prettier --list-different \"**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}\"",
-    "prepare": "jlpm run clean && jlpm run build",
-    "watch": "tsc -w"
+    "watch": "run-p watch:src watch:labextension",
+    "watch:labextension": "jupyter labextension watch .",
+    "watch:src": "tsc -w"
   },
   "dependencies": {
-    "@jupyterlab/application": "^2.1.2",
-    "@jupyterlab/apputils": "^2.1.1",
-    "@jupyterlab/coreutils": "^4.1.0",
-    "@jupyterlab/docregistry": "^2.1.2",
-    "@jupyterlab/documentsearch": "^2.1.2",
-    "@jupyterlab/filebrowser": "^2.1.2",
-    "@jupyterlab/fileeditor": "^2.1.2",
-    "@jupyterlab/launcher": "^2.1.1",
-    "@jupyterlab/mainmenu": "^2.1.1",
-    "@jupyterlab/ui-components": "^2.1.1",
-    "@lumino/commands": "^1.11.0",
-    "@lumino/coreutils": "^1.5.0",
-    "@lumino/messaging": "^1.4.0",
-    "@lumino/signaling": "^1.4.0",
-    "@lumino/widgets": "^1.13.0",
-    "@types/codemirror": "0.0.76",
+    "@jupyterlab/application": "^3.0.3",
+    "@jupyterlab/apputils": "^3.0.2",
+    "@jupyterlab/coreutils": "^5.0.1",
+    "@jupyterlab/docregistry": "^3.0.3",
+    "@jupyterlab/documentsearch": "^3.0.3",
+    "@jupyterlab/filebrowser": "^3.0.3",
+    "@jupyterlab/fileeditor": "^3.0.3",
+    "@jupyterlab/launcher": "^3.0.2",
+    "@jupyterlab/mainmenu": "^3.0.2",
+    "@jupyterlab/ui-components": "^3.0.2",
+    "@lumino/commands": "^1.12.0",
+    "@lumino/coreutils": "^1.5.3",
+    "@lumino/messaging": "^1.4.3",
+    "@lumino/signaling": "^1.4.3",
+    "@lumino/widgets": "^1.16.1",
+    "@types/codemirror": "0.0.97",
     "@types/jexcel": "^3.9.1",
     "@types/papaparse": "^5.0.3",
     "jexcel": "^4.2.0",
     "papaparse": "^5.2.0"
   },
   "devDependencies": {
+    "@jupyterlab/builder": "^3.0.0-rc.13",
     "@typescript-eslint/eslint-plugin": "^2.27.0",
     "@typescript-eslint/parser": "^2.27.0",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.7.0",
-    "eslint-plugin-prettier": "^3.1.1",
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.19.0",
-    "prettier": "^2.0.5",
-    "rimraf": "^2.6.1",
-    "typescript": "~3.7.0"
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.19.0",
+    "rimraf": "^3.0.2",
+    "typescript": "~4.1.3"
   },
   "sideEffects": [
-    "style/*.css"
+    "style/*.css",
+    "style/index.js"
   ],
   "jupyterlab": {
-    "extension": true
-  }
+    "extension": true,
+    "outputDir": "spreadsheet-editor/labextension"
+  },
+  "styleModule": "style/index.js"
 }

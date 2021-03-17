@@ -1,39 +1,49 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-import { ILayoutRestorer, JupyterFrontEnd, JupyterFrontEndPlugin } from '@jupyterlab/application';
+import {
+  ILayoutRestorer,
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin
+} from '@jupyterlab/application';
 import { IEditMenu, IMainMenu } from '@jupyterlab/mainmenu';
-import { ABCWidgetFactory, DocumentRegistry, IDocumentWidget } from "@jupyterlab/docregistry";
-import { IEditorTracker } from "@jupyterlab/fileeditor";
-import { ICommandPalette, WidgetTracker } from "@jupyterlab/apputils";
-import { ISearchProviderRegistry } from "@jupyterlab/documentsearch";
+import {
+  ABCWidgetFactory,
+  DocumentRegistry,
+  IDocumentWidget
+} from '@jupyterlab/docregistry';
+import { IEditorTracker } from '@jupyterlab/fileeditor';
+import { ICommandPalette, WidgetTracker } from '@jupyterlab/apputils';
+import { ISearchProviderRegistry } from '@jupyterlab/documentsearch';
 import { CommandRegistry } from '@lumino/commands';
 
-import "../style/index.css";
-import { SpreadsheetWidget } from "./widget";
-import { SpreadsheetEditorDocumentWidget } from "./documentwidget";
-import { SpreadsheetSearchProvider } from "./searchprovider";
-import { ILauncher } from "@jupyterlab/launcher";
-import { spreadsheetIcon } from "@jupyterlab/ui-components";
-import { IFileBrowserFactory } from "@jupyterlab/filebrowser";
-
+import '../style/index.css';
+import { SpreadsheetWidget } from './widget';
+import { SpreadsheetEditorDocumentWidget } from './documentwidget';
+import { SpreadsheetSearchProvider } from './searchprovider';
+import { ILauncher } from '@jupyterlab/launcher';
+import { spreadsheetIcon } from '@jupyterlab/ui-components';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 
 const paletteCategory = 'Spreadsheet Editor';
 
-const FACTORY = 'Spreadsheet Editor'
+const FACTORY = 'Spreadsheet Editor';
 
 /**
  * A widget factory for editors.
  */
-export
-class SpreadsheetEditorFactory extends ABCWidgetFactory<IDocumentWidget<SpreadsheetWidget>, DocumentRegistry.ICodeModel> {
-
+export class SpreadsheetEditorFactory extends ABCWidgetFactory<
+  IDocumentWidget<SpreadsheetWidget>,
+  DocumentRegistry.ICodeModel
+> {
   /**
    * Create a new widget given a context.
    */
-  protected createNewWidget(context: DocumentRegistry.CodeContext): IDocumentWidget<SpreadsheetWidget> {
+  protected createNewWidget(
+    context: DocumentRegistry.CodeContext
+  ): IDocumentWidget<SpreadsheetWidget> {
     const content = new SpreadsheetWidget(context);
-    return new SpreadsheetEditorDocumentWidget({content, context});
+    return new SpreadsheetEditorDocumentWidget({ content, context });
   }
 }
 
@@ -60,11 +70,7 @@ export function addUndoRedoToEditMenu(
 /**
  * Function to create a new untitled text file, given the current working directory.
  */
-function createNew(
-  commands: CommandRegistry,
-  cwd: string,
-  ext: string = 'tsv'
-) {
+function createNew(commands: CommandRegistry, cwd: string, ext = 'tsv') {
   return commands
     .execute('docmanager:new-untitled', {
       path: cwd,
@@ -161,7 +167,7 @@ const extension: JupyterFrontEndPlugin<void> = {
       defaultFor: ['csv', 'tsv']
     });
 
-    let tracker = new WidgetTracker<IDocumentWidget<SpreadsheetWidget>>({
+    const tracker = new WidgetTracker<IDocumentWidget<SpreadsheetWidget>>({
       namespace: 'spreadsheet-editor'
     });
 
@@ -195,7 +201,6 @@ const extension: JupyterFrontEndPlugin<void> = {
       searchregistry.register('spreadsheet-editor', SpreadsheetSearchProvider);
     }
 
-
     addCreateNewCommands(app.commands, browserFactory);
 
     if (palette) {
@@ -210,15 +215,14 @@ const extension: JupyterFrontEndPlugin<void> = {
         category: paletteCategory
       });
     }
-    
+
     if (launcher) {
-      addCreateNewToLauncher(launcher)
+      addCreateNewToLauncher(launcher);
     }
 
     if (menu) {
       addUndoRedoToEditMenu(menu, tracker);
     }
-
   }
 };
 
