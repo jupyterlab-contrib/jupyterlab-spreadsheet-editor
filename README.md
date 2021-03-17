@@ -5,7 +5,7 @@
 JupyterLab spreadsheet editor enables interactive editing of comma/tab separated value spreadsheets.
 It support formulas, sorting, column/row rearrangements and more!
 
-> Note: unless you need formula and/or column/row freeze support you probably want to use a newer extension: [tabular-data-editor](https://github.com/jupytercalpoly/jupyterlab-tabular-data-editor)
+> Note: you might be interested to checkout [tabular-data-editor](https://github.com/jupytercalpoly/jupyterlab-tabular-data-editor), which however only works with old JupyterLab 2.0
 
 ## Showcase
 
@@ -41,7 +41,7 @@ the spreadsheet interface is built with the [jexcel](https://github.com/paulhode
 ## Install
 
 ```bash
-pip install spreadsheet-editor
+pip install jupyterlab-spreadsheet-editor
 ```
 
 ## Contributing
@@ -85,7 +85,7 @@ jupyter lab build --minimize=False
 ### Uninstall
 
 ```bash
-pip uninstall spreadsheet-editor
+pip uninstall jupyterlab-spreadsheet-editor
 ```
 
 ## Related extensions
