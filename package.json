@@ -91,7 +91,7 @@
   ],
   "jupyterlab": {
     "extension": true,
-    "outputDir": "spreadsheet-editor/labextension"
+    "outputDir": "jupyterlab-spreadsheet-editor/labextension"
   },
   "styleModule": "style/index.js"
 }

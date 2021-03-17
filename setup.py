@@ -13,7 +13,7 @@ import setuptools
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 # The name of the project
-name="spreadsheet-editor"
+name="jupyterlab-spreadsheet-editor"
 
 # Get our version
 with open(os.path.join(HERE, 'package.json')) as f:
