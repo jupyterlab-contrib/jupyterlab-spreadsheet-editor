@@ -8,7 +8,7 @@ It support formulas, sorting, column/row rearrangements and more!
 > Note: unless you need formula and/or column/row freeze support you probably want to use a newer extension: [tabular-data-editor](https://github.com/jupytercalpoly/jupyterlab-tabular-data-editor)
 
 ## Showcase
- 
+
 **Fully featured integration**
 
 - row/column operations, column width adjustment
@@ -26,7 +26,6 @@ for exploration of wide datasets with many covariates
 
 ![](screenshots/freeze-support.gif)
 
-
 **Launcher items**:
 create CSV/TSV files easily from the launcher or the palette.
 
@@ -35,17 +34,15 @@ create CSV/TSV files easily from the launcher or the palette.
 **Lightweight and reliable dependencies**:
 the spreadsheet interface is built with the [jexcel](https://github.com/paulhodel/jexcel), while [Papa Parse](https://github.com/mholt/PapaParse) provides very fast, [RFC 4180](https://tools.ietf.org/html/rfc4180) compatible CSV parsing (both have no third-party dependencies).
 
-
 ## Requirements
 
-* JupyterLab >= 3.0
+- JupyterLab >= 3.0
 
 ## Install
 
 ```bash
 pip install spreadsheet-editor
 ```
-
 
 ## Contributing
 
@@ -85,7 +82,6 @@ By default, the `jlpm run build` command generates the source maps for this exte
 jupyter lab build --minimize=False
 ```
 
-
 ### Uninstall
 
 ```bash
@@ -95,6 +91,7 @@ pip uninstall spreadsheet-editor
 ## Related extensions
 
 Spreadsheet editors:
+
 - [jupyterlab-tabular-data-editor](https://github.com/jupytercalpoly/jupyterlab-tabular-data-editor)
 
 Spreadsheet viewers:
