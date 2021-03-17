@@ -1,3 +1,4 @@
 node_modules
-lib
-.ipynb_checkpoints
+**/node_modules
+**/lib
+**/package.json
