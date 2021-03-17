@@ -56,7 +56,7 @@ The `jlpm` command is JupyterLab's pinned version of
 
 ```bash
 # Clone the repo to your local environment
-# Change directory to the spreadsheet-editor directory
+# Change directory to the jupyterlab-spreadsheet-editor directory
 # Install package in development mode
 pip install -e .
 # Link your development version of the extension with JupyterLab
