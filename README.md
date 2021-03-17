@@ -1,6 +1,6 @@
 # JupyterLab Spreadsheet Editor
 
-![Github Actions Status](https://github.com/krassowski/jupyterlab-spreadsheet-editor.git/workflows/Build/badge.svg)
+![Github Actions Status](https://github.com/krassowski/jupyterlab-spreadsheet-editor/workflows/Build/badge.svg)
 
 JupyterLab spreadsheet editor enables interactive editing of comma/tab separated value spreadsheets.
 It support formulas, sorting, column/row rearrangements and more!
