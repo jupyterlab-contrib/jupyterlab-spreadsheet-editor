@@ -17,8 +17,11 @@ module.exports = {
       { prefixWithI: 'always' }
     ],
     '@typescript-eslint/no-unused-vars': ['warn', { args: 'none' }],
+    '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-namespace': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/ban-ts-ignore': 'warn',
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/quotes': [
       'error',

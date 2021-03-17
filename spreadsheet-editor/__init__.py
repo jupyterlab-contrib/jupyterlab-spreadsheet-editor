@@ -15,5 +15,3 @@ def _jupyter_labextension_paths():
         'dest': data['name']
     }]
 
-
-
