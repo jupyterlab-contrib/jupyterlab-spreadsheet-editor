@@ -14,22 +14,22 @@ It support formulas, sorting, column/row rearrangements and more!
 - row/column operations, column width adjustment
 - search and replace
 
-![](screenshots/setosa-demo.gif)
+![](https://raw.githubusercontent.com/krassowski/jupyterlab-spreadsheet-editor/master/screenshots/setosa-demo.gif)
 
 **Formula support**
 basic formula calculation (rendering) - as implemented by jExcel.
 
-![](screenshots/formula-support.gif)
+![](https://raw.githubusercontent.com/krassowski/jupyterlab-spreadsheet-editor/master/screenshots/formula-support.gif)
 
 **Column freezing**
 for exploration of wide datasets with many covariates
 
-![](screenshots/freeze-support.gif)
+![](https://raw.githubusercontent.com/krassowski/jupyterlab-spreadsheet-editor/master/screenshots/freeze-support.gif)
 
 **Launcher items**:
 create CSV/TSV files easily from the launcher or the palette.
 
-![](screenshots/launcher.png)
+![](https://raw.githubusercontent.com/krassowski/jupyterlab-spreadsheet-editor/master/screenshots/launcher.png)
 
 **Lightweight and reliable dependencies**:
 the spreadsheet interface is built with the [jexcel](https://github.com/paulhodel/jexcel), while [Papa Parse](https://github.com/mholt/PapaParse) provides very fast, [RFC 4180](https://tools.ietf.org/html/rfc4180) compatible CSV parsing (both have no third-party dependencies).
