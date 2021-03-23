@@ -115,6 +115,11 @@ export class SpreadsheetWidget extends Widget {
     return columns;
   }
 
+  private onChange(): void {
+    this.context.model.value.text = this.getValue();
+    this.changed.emit();
+  }
+
   private _onContextReady(): void {
     if (this.isDisposed) {
       return;
@@ -135,17 +140,34 @@ export class SpreadsheetWidget extends Widget {
       csvFileName: this.title.label,
       columnDrag: true,
       onchange: () => {
-        this.context.model.value.text = this.getValue();
-        this.changed.emit();
+        this.onChange();
+      },
+      // insert
+      oninsertrow: () => {
+        this.onChange();
       },
       oninsertcolumn: () => {
+        this.onChange();
         this.populateColumnTypesBar();
         this.onResize();
+      },
+      // move
+      onmoverow: () => {
+        this.onChange();
+      },
+      onmovecolumn: () => {
+        this.onChange();
+      },
+      // delete
+      ondeleterow: () => {
+        this.onChange();
       },
       ondeletecolumn: () => {
+        this.onChange();
         this.populateColumnTypesBar();
         this.onResize();
       },
+      // resize
       onresizecolumn: () => {
         this.adjustColumnTypesWidth();
       },
