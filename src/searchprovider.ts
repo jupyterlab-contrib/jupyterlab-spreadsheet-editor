@@ -293,7 +293,10 @@ export class SpreadsheetSearchProvider
   }
 
   private _onSheetChanged() {
+    // matches may need updating
     this._matches = this.findMatches(false);
+    // update backlight
+    this.backlightOff();
     this.backlightMatches();
     this._changed.emit(undefined);
   }
