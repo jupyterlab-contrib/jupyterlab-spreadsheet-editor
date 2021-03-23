@@ -1,11 +1,12 @@
 # JupyterLab Spreadsheet Editor
 
 ![Github Actions Status](https://github.com/krassowski/jupyterlab-spreadsheet-editor/workflows/Build/badge.svg)
+[![pypi-version](https://img.shields.io/pypi/v/jupyterlab-spreadsheet-editor.svg)](https://python.org/pypi/jupyterlab-spreadsheet-editor)
 
 JupyterLab spreadsheet editor enables interactive editing of comma/tab separated value spreadsheets.
 It support formulas, sorting, column/row rearrangements and more!
 
-> Note: you might be interested to checkout [tabular-data-editor](https://github.com/jupytercalpoly/jupyterlab-tabular-data-editor), which however only works with old JupyterLab 2.0
+> Note: you might be interested to checkout [tabular-data-editor](https://github.com/jupytercalpoly/jupyterlab-tabular-data-editor) as well
 
 ## Showcase
 
