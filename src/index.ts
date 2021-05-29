@@ -24,6 +24,13 @@ import { SpreadsheetSearchProvider } from './searchprovider';
 import { ILauncher } from '@jupyterlab/launcher';
 import { spreadsheetIcon } from '@jupyterlab/ui-components';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+import { IStatusBar } from '@jupyterlab/statusbar';
+import { SelectionStatus } from './statusbar';
+import {
+  ITranslator,
+  nullTranslator,
+  TranslationBundle
+} from '@jupyterlab/translation';
 
 const paletteCategory = 'Spreadsheet Editor';
 
@@ -43,7 +50,11 @@ export class SpreadsheetEditorFactory extends ABCWidgetFactory<
     context: DocumentRegistry.CodeContext
   ): IDocumentWidget<SpreadsheetWidget> {
     const content = new SpreadsheetWidget(context);
-    return new SpreadsheetEditorDocumentWidget({ content, context });
+    return new SpreadsheetEditorDocumentWidget({
+      content,
+      context,
+      translator: this.translator
+    });
   }
 }
 
@@ -97,15 +108,18 @@ export namespace CommandIDs {
 /**
  * Add Create New DSV File to the Launcher
  */
-export function addCreateNewToLauncher(launcher: ILauncher) {
+export function addCreateNewToLauncher(
+  launcher: ILauncher,
+  trans: TranslationBundle
+) {
   launcher.add({
     command: CommandIDs.createNewCSV,
-    category: 'Other',
+    category: trans.__('Other'),
     rank: 3
   });
   launcher.add({
     command: CommandIDs.createNewTSV,
-    category: 'Other',
+    category: trans.__('Other'),
     rank: 3
   });
 }
@@ -115,11 +129,13 @@ export function addCreateNewToLauncher(launcher: ILauncher) {
  */
 export function addCreateNewCommands(
   commands: CommandRegistry,
-  browserFactory: IFileBrowserFactory
+  browserFactory: IFileBrowserFactory,
+  trans: TranslationBundle
 ) {
   commands.addCommand(CommandIDs.createNewCSV, {
-    label: args => (args['isPalette'] ? 'New CSV File' : 'CSV File'),
-    caption: 'Create a new CSV file',
+    label: args =>
+      args['isPalette'] ? trans.__('New CSV File') : trans.__('CSV File'),
+    caption: trans.__('Create a new CSV file'),
     icon: args => (args['isPalette'] ? undefined : spreadsheetIcon),
     execute: args => {
       const cwd = args['cwd'] || browserFactory.defaultBrowser.model.path;
@@ -127,8 +143,9 @@ export function addCreateNewCommands(
     }
   });
   commands.addCommand(CommandIDs.createNewTSV, {
-    label: args => (args['isPalette'] ? 'New TSV File' : 'TSV File'),
-    caption: 'Create a new TSV file',
+    label: args =>
+      args['isPalette'] ? trans.__('New TSV File') : trans.__('TSV File'),
+    caption: trans.__('Create a new TSV file'),
     icon: args => (args['isPalette'] ? undefined : spreadsheetIcon),
     execute: args => {
       const cwd = args['cwd'] || browserFactory.defaultBrowser.model.path;
@@ -137,11 +154,13 @@ export function addCreateNewCommands(
   });
 }
 
+const PLUGIN_ID = 'spreadsheet-editor';
+
 /**
  * Initialization data for the spreadsheet-editor extension.
  */
 const extension: JupyterFrontEndPlugin<void> = {
-  id: 'spreadsheet-editor',
+  id: PLUGIN_ID,
   autoStart: true,
   requires: [IEditorTracker, IFileBrowserFactory],
   optional: [
@@ -149,7 +168,9 @@ const extension: JupyterFrontEndPlugin<void> = {
     ILauncher,
     IMainMenu,
     ILayoutRestorer,
-    ISearchProviderRegistry
+    ISearchProviderRegistry,
+    IStatusBar,
+    ITranslator
   ],
   activate: (
     app: JupyterFrontEnd,
@@ -159,16 +180,22 @@ const extension: JupyterFrontEndPlugin<void> = {
     launcher: ILauncher | null,
     menu: IMainMenu | null,
     restorer: ILayoutRestorer | null,
-    searchregistry: ISearchProviderRegistry | null
+    searchregistry: ISearchProviderRegistry | null,
+    statusBar: IStatusBar | null,
+    translator: ITranslator | null
   ) => {
+    translator = translator || nullTranslator;
+    const trans = translator.load(PLUGIN_ID);
+
     const factory = new SpreadsheetEditorFactory({
       name: FACTORY,
       fileTypes: ['csv', 'tsv', '*'],
-      defaultFor: ['csv', 'tsv']
+      defaultFor: ['csv', 'tsv'],
+      translator: translator
     });
 
     const tracker = new WidgetTracker<IDocumentWidget<SpreadsheetWidget>>({
-      namespace: 'spreadsheet-editor'
+      namespace: PLUGIN_ID
     });
 
     if (restorer) {
@@ -198,10 +225,10 @@ const extension: JupyterFrontEndPlugin<void> = {
     });
 
     if (searchregistry) {
-      searchregistry.register('spreadsheet-editor', SpreadsheetSearchProvider);
+      searchregistry.register(PLUGIN_ID, SpreadsheetSearchProvider);
     }
 
-    addCreateNewCommands(app.commands, browserFactory);
+    addCreateNewCommands(app.commands, browserFactory, trans);
 
     if (palette) {
       palette.addItem({
@@ -217,11 +244,30 @@ const extension: JupyterFrontEndPlugin<void> = {
     }
 
     if (launcher) {
-      addCreateNewToLauncher(launcher);
+      addCreateNewToLauncher(launcher, trans);
     }
 
     if (menu) {
       addUndoRedoToEditMenu(menu, tracker);
+    }
+
+    if (statusBar) {
+      const item = new SelectionStatus(translator);
+      // Keep the status item up-to-date with the current spreadsheet editor.
+      tracker.currentChanged.connect(() => {
+        const current = tracker.currentWidget;
+        item.model.spreadsheetWidget = current?.content;
+      });
+
+      statusBar.registerStatusItem(PLUGIN_ID, {
+        item,
+        align: 'right',
+        rank: 4,
+        isActive: () =>
+          !!app.shell.currentWidget &&
+          !!tracker.currentWidget &&
+          app.shell.currentWidget === tracker.currentWidget
+      });
     }
   }
 };
