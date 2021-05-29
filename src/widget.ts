@@ -24,6 +24,11 @@ type columnTypeId =
   | 'radio'
   | 'text';
 
+export interface ISelection {
+  rows: number;
+  columns: number;
+}
+
 /**
  * An spreadsheet widget.
  */
@@ -45,6 +50,7 @@ export class SpreadsheetWidget extends Widget {
   protected firstRowAsHeader: boolean;
   private header: Array<string>;
   private columnTypes: Array<columnTypeId>;
+  public selectionChanged: Signal<SpreadsheetWidget, ISelection>;
 
   constructor(context: DocumentRegistry.CodeContext) {
     super();
@@ -69,6 +75,11 @@ export class SpreadsheetWidget extends Widget {
       })
       .catch(console.warn);
     this.changed = new Signal<this, void>(this);
+    this._selection = {
+      rows: 0,
+      columns: 0
+    };
+    this.selectionChanged = new Signal(this);
   }
 
   protected parseValue(content: string): jexcel.CellValue[][] {
@@ -119,6 +130,12 @@ export class SpreadsheetWidget extends Widget {
     this.context.model.value.text = this.getValue();
     this.changed.emit();
   }
+
+  public get selection(): ISelection {
+    return this._selection;
+  }
+
+  private _selection: ISelection;
 
   private _onContextReady(): void {
     if (this.isDisposed) {
@@ -179,6 +196,11 @@ export class SpreadsheetWidget extends Widget {
         borderBottom: number,
         origin: any
       ) => {
+        this._selection = {
+          rows: borderBottom - borderTop + 1,
+          columns: borderRight - borderLeft + 1
+        };
+        this.selectionChanged.emit(this._selection);
         // TODO: support all corners of selection
         this.scrollCellIntoView({ column: borderLeft, row: borderTop });
       },

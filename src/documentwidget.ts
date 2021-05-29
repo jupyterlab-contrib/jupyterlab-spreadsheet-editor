@@ -15,19 +15,25 @@ import freezeColumnSvg from '../style/icons/mdi-snowflake.svg';
 import unfreezeColumnSvg from '../style/icons/mdi-snowflake-off.svg';
 import listTypeSvg from '../style/icons/mdi-format-list-bulleted-type.svg';
 import topHeaderSvg from '../style/icons/mdi-page-layout-header.svg';
+import { nullTranslator, TranslationBundle } from '@jupyterlab/translation';
 
 export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
   SpreadsheetWidget
 > {
+  protected _trans: TranslationBundle;
+
   constructor(options: DocumentWidget.IOptions<SpreadsheetWidget>) {
     super(options);
+    const translator = options.translator || nullTranslator;
+    this._trans = translator.load('spreadsheet-editor');
+
     const addRowButton = new ToolbarButton({
       icon: new LabIcon({ name: 'spreadsheet:add-row', svgstr: addRowSvg }),
       onClick: () => {
         this.content.jexcel.insertRow();
         this.content.updateModel();
       },
-      tooltip: 'Insert a row at the end'
+      tooltip: this._trans.__('Insert a row at the end')
     });
     this.toolbar.addItem('spreadsheet:insert-row', addRowButton);
 
@@ -40,7 +46,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
         this.content.jexcel.deleteRow(this.content.jexcel.rows.length - 1, 1);
         this.content.updateModel();
       },
-      tooltip: 'Remove the last row'
+      tooltip: this._trans.__('Remove the last row')
     });
     this.toolbar.addItem('spreadsheet:remove-row', removeRowButton);
 
@@ -53,7 +59,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
         this.content.jexcel.insertColumn(null, null);
         this.content.updateModel();
       },
-      tooltip: 'Insert a column at the end'
+      tooltip: this._trans.__('Insert a column at the end')
     });
     this.toolbar.addItem('spreadsheet:insert-column', addColumnButton);
 
@@ -66,7 +72,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
         this.content.jexcel.deleteColumn(this.content.columnsNumber, null);
         this.content.updateModel();
       },
-      tooltip: 'Remove the last column'
+      tooltip: this._trans.__('Remove the last column')
     });
     this.toolbar.addItem('spreadsheet:remove-column', removeColumnButton);
 
@@ -84,7 +90,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
         }
         indexVisible = !indexVisible;
       },
-      tooltip: 'Show/hide row numbers'
+      tooltip: this._trans.__('Show/hide row numbers')
     });
     this.toolbar.addItem('spreadsheet:show-hide-index', showHideIndex);
 
@@ -106,7 +112,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
         }
         this.content.relayout();
       },
-      tooltip: 'Fit columns width'
+      tooltip: this._trans.__('Fit columns width')
     });
     this.toolbar.addItem('spreadsheet:fit-columns', fitColumnWidthButton);
 
@@ -118,7 +124,9 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
       onClick: () => {
         this.content.freezeSelectedColumns();
       },
-      tooltip: 'Freeze the initial columns (up to the selected column)'
+      tooltip: this._trans.__(
+        'Freeze the initial columns (up to the selected column)'
+      )
     });
     this.toolbar.addItem('spreadsheet:freeze-columns', freezeColumnButton);
 
@@ -130,7 +138,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
       onClick: () => {
         this.content.unfreezeColumns();
       },
-      tooltip: 'Unfreeze frozen column'
+      tooltip: this._trans.__('Unfreeze frozen column')
     });
     this.toolbar.addItem('spreadsheet:unfreeze-columns', unfreezeColumnButton);
 
@@ -142,7 +150,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
       onClick: () => {
         this.content.switchHeaders();
       },
-      tooltip: 'First row as a header'
+      tooltip: this._trans.__('First row as a header')
     });
     this.toolbar.addItem('spreadsheet:switch-headers', switchHeadersButton);
 
@@ -154,7 +162,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
       onClick: () => {
         this.content.switchTypesBar();
       },
-      tooltip: 'Show/hide column types bar'
+      tooltip: this._trans.__('Show/hide column types bar')
     });
     this.toolbar.addItem(
       'spreadsheet:switch-column-types-bar',
