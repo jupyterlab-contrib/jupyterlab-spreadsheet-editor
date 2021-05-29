@@ -72,7 +72,7 @@ export class SpreadsheetWidget extends Widget {
   }
 
   protected parseValue(content: string): jexcel.CellValue[][] {
-    const parsed = Papa.parse(content, { delimiter: this.separator });
+    const parsed = Papa.parse<string[]>(content, { delimiter: this.separator });
     if (!this.separator) {
       this.separator = parsed.meta.delimiter;
     }
