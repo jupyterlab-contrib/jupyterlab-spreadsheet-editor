@@ -150,9 +150,7 @@ export class SpreadsheetWidget extends Widget {
     const options: jexcel.Options = {
       data: data,
       minDimensions: [1, 1],
-      // @ts-ignore
-      //minSpareCols: 1,
-      // @ts-ignore
+      // minSpareCols: 1,
       // minSpareRows: 1,
       csvFileName: this.title.label,
       columnDrag: true,

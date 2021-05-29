@@ -1,6 +1,6 @@
 {
   "name": "spreadsheet-editor",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "JupyterLab spreadsheet (csv/tsv) editor",
   "keywords": [
     "jupyter",
