@@ -33,7 +33,7 @@ export class SelectionStatus extends VDomRenderer<SelectionStatus.Model> {
     }
     this.node.title =
       this._trans._n('Selected %1 row', 'Selected %1 rows', selection.rows) +
-      this._trans._n(' and %1 column', 'and %1 columns', selection.columns);
+      this._trans._n(' and %1 column', ' and %1 columns', selection.columns);
 
     const text =
       this._trans._n('%1 row', '%1 rows', selection.rows) +
