@@ -2586,9 +2586,9 @@ jsonfile@^6.0.1:
     graceful-fs "^4.1.6"
 
 jsuites@^4.1.0:
-  version "4.6.7"
-  resolved "https://registry.yarnpkg.com/jsuites/-/jsuites-4.6.7.tgz#89f82d82358cb12232b58595de9ddf5ef0b59f18"
-  integrity sha512-os5XSdE/YaSuYDp56Mv/kP2RXnrXKV6BIqZcmpaVL/wrBD7VgZ1eiJtexzWIJ29GoclHpEWH+19WqLZOmpvPRw==
+  version "4.9.11"
+  resolved "https://registry.yarnpkg.com/jsuites/-/jsuites-4.9.11.tgz#c5036f2ac9f9742cb66ef7531c199b0b0e7410fd"
+  integrity sha512-FiulrkDSPOI4dBqcxs0E+XV0Nwf0tLSTWPSClDB7K9z/X7m+XQgRnx6TzkcxkbcQoABICpS66GkwPXlBC4VDVg==
 
 "jsx-ast-utils@^2.4.1 || ^3.0.0":
   version "3.2.0"
