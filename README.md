@@ -2,7 +2,7 @@
 
 [![Extension status](https://img.shields.io/badge/status-ready-success "ready to be used")](https://jupyterlab-contrib.github.io/)
 [![GitHub Action Status](https://github.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/actions/workflows/build.yml/badge.svg)](https://github.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/actions/workflows/build.yml)
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab-contrib/jupyterlab-spreadsheet-editor/master?urlpath=lab)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab-contrib/jupyterlab-spreadsheet-editor/main?urlpath=lab)
 [![pypi-version](https://img.shields.io/pypi/v/jupyterlab-spreadsheet-editor.svg)](https://python.org/pypi/jupyterlab-spreadsheet-editor)
 
 JupyterLab spreadsheet editor enables interactive editing of comma/tab separated value spreadsheets.
@@ -17,22 +17,22 @@ It support formulas, sorting, column/row rearrangements and more!
 - row/column operations, column width adjustment
 - search and replace
 
-![](https://raw.githubusercontent.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/master/screenshots/setosa-demo.gif)
+![](https://raw.githubusercontent.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/main/screenshots/setosa-demo.gif)
 
 **Formula support**
 basic formula calculation (rendering) - as implemented by jExcel.
 
-![](https://raw.githubusercontent.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/master/screenshots/formula-support.gif)
+![](https://raw.githubusercontent.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/main/screenshots/formula-support.gif)
 
 **Column freezing**
 for exploration of wide datasets with many covariates
 
-![](https://raw.githubusercontent.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/master/screenshots/freeze-support.gif)
+![](https://raw.githubusercontent.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/main/screenshots/freeze-support.gif)
 
 **Launcher items**:
 create CSV/TSV files easily from the launcher or the palette.
 
-![](https://raw.githubusercontent.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/master/screenshots/launcher.png)
+![](https://raw.githubusercontent.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/main/screenshots/launcher.png)
 
 **Lightweight and reliable dependencies**:
 the spreadsheet interface is built with the [jexcel](https://github.com/paulhodel/jexcel), while [Papa Parse](https://github.com/mholt/PapaParse) provides very fast, [RFC 4180](https://tools.ietf.org/html/rfc4180) compatible CSV parsing (both have no third-party dependencies).
