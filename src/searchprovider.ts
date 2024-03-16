@@ -217,6 +217,10 @@ export class SpreadsheetSearchProvider extends SearchProvider<SpreadsheetEditorD
         return value.toString();
       }
     }
+    // Close the editor to avoid overwriting contents of last edited cell
+    // as users starts typing into the search box after pressing ctrl + f
+    // (but only do that after the initial value was taken)
+    this._target.resetSelection(true);
     return '';
   }
 
@@ -422,15 +426,9 @@ export class SpreadsheetSearchProvider extends SearchProvider<SpreadsheetEditorD
     return matches;
   }
   async startQuery(query: RegExp, filters: IFilters): Promise<void> {
-    console.log('a');
     const searchTarget = this.widget;
     this._sheet = searchTarget.content;
     this._query = query;
-    this._target.resetSelection(true);
-
-    this._sheet.node.blur();
-    // TODO
-    //this._target.el.blur();
 
     this._sheet.changed.connect(this._onSheetChanged, this);
 
