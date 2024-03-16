@@ -5,21 +5,21 @@ import { DocumentWidget } from '@jupyterlab/docregistry';
 import { SpreadsheetWidget } from './widget';
 import { ToolbarButton } from '@jupyterlab/apputils';
 import { LabIcon } from '@jupyterlab/ui-components';
-import addRowSvg from '../style/icons/mdi-table-row-plus-after.svg';
-import removeRowSvg from '../style/icons/mdi-table-row-remove.svg';
-import addColumnSvg from '../style/icons/mdi-table-column-plus-after.svg';
-import removeColumnSvg from '../style/icons/mdi-table-column-remove.svg';
 import numberedSvg from '../style/icons/mdi-format-list-numbered.svg';
 import fitColumnWidthSvg from '../style/icons/mdi-table-column-width.svg';
-import freezeColumnSvg from '../style/icons/mdi-snowflake.svg';
-import unfreezeColumnSvg from '../style/icons/mdi-snowflake-off.svg';
 import listTypeSvg from '../style/icons/mdi-format-list-bulleted-type.svg';
 import topHeaderSvg from '../style/icons/mdi-page-layout-header.svg';
+import {
+  freezeColumnIcon,
+  unfreezeColumnIcon,
+  removeColumnIcon,
+  addColumnIcon,
+  removeRowIcon,
+  addRowIcon
+} from './icons';
 import { nullTranslator, TranslationBundle } from '@jupyterlab/translation';
 
-export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
-  SpreadsheetWidget
-> {
+export class SpreadsheetEditorDocumentWidget extends DocumentWidget<SpreadsheetWidget> {
   protected _trans: TranslationBundle;
 
   constructor(options: DocumentWidget.IOptions<SpreadsheetWidget>) {
@@ -28,9 +28,9 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
     this._trans = translator.load('spreadsheet-editor');
 
     const addRowButton = new ToolbarButton({
-      icon: new LabIcon({ name: 'spreadsheet:add-row', svgstr: addRowSvg }),
+      icon: addRowIcon,
       onClick: () => {
-        this.content.jexcel.insertRow();
+        this.content.jexcel!.insertRow();
         this.content.updateModel();
       },
       tooltip: this._trans.__('Insert a row at the end')
@@ -38,12 +38,9 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
     this.toolbar.addItem('spreadsheet:insert-row', addRowButton);
 
     const removeRowButton = new ToolbarButton({
-      icon: new LabIcon({
-        name: 'spreadsheet:remove-row',
-        svgstr: removeRowSvg
-      }),
+      icon: removeRowIcon,
       onClick: () => {
-        this.content.jexcel.deleteRow(this.content.jexcel.rows.length - 1, 1);
+        this.content.jexcel!.deleteRow(this.content.jexcel!.rows.length - 1, 1);
         this.content.updateModel();
       },
       tooltip: this._trans.__('Remove the last row')
@@ -51,12 +48,9 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
     this.toolbar.addItem('spreadsheet:remove-row', removeRowButton);
 
     const addColumnButton = new ToolbarButton({
-      icon: new LabIcon({
-        name: 'spreadsheet:add-column',
-        svgstr: addColumnSvg
-      }),
+      icon: addColumnIcon,
       onClick: () => {
-        this.content.jexcel.insertColumn(null, null);
+        this.content.jexcel!.insertColumn();
         this.content.updateModel();
       },
       tooltip: this._trans.__('Insert a column at the end')
@@ -64,12 +58,9 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
     this.toolbar.addItem('spreadsheet:insert-column', addColumnButton);
 
     const removeColumnButton = new ToolbarButton({
-      icon: new LabIcon({
-        name: 'spreadsheet:remove-column',
-        svgstr: removeColumnSvg
-      }),
+      icon: removeColumnIcon,
       onClick: () => {
-        this.content.jexcel.deleteColumn(this.content.columnsNumber, null);
+        this.content.jexcel!.deleteColumn(this.content.columnsNumber);
         this.content.updateModel();
       },
       tooltip: this._trans.__('Remove the last column')
@@ -84,9 +75,9 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
       }),
       onClick: () => {
         if (indexVisible) {
-          this.content.jexcel.hideIndex();
+          this.content.jexcel!.hideIndex();
         } else {
-          this.content.jexcel.showIndex();
+          this.content.jexcel!.showIndex();
         }
         indexVisible = !indexVisible;
       },
@@ -117,10 +108,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
     this.toolbar.addItem('spreadsheet:fit-columns', fitColumnWidthButton);
 
     const freezeColumnButton = new ToolbarButton({
-      icon: new LabIcon({
-        name: 'spreadsheet:freeze-columns',
-        svgstr: freezeColumnSvg
-      }),
+      icon: freezeColumnIcon,
       onClick: () => {
         this.content.freezeSelectedColumns();
       },
@@ -131,10 +119,7 @@ export class SpreadsheetEditorDocumentWidget extends DocumentWidget<
     this.toolbar.addItem('spreadsheet:freeze-columns', freezeColumnButton);
 
     const unfreezeColumnButton = new ToolbarButton({
-      icon: new LabIcon({
-        name: 'spreadsheet:unfreeze-columns',
-        svgstr: unfreezeColumnSvg
-      }),
+      icon: unfreezeColumnIcon,
       onClick: () => {
         this.content.unfreezeColumns();
       },

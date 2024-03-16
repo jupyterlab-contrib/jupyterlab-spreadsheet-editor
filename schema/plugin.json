@@ -1,0 +1,77 @@
+{
+  "jupyter.lab.shortcuts": [],
+  "title": "JupyterLab Spreadsheet Editor",
+  "description": "JupyterLab spreadsheet editor settings.",
+  "jupyter.lab.menus": {
+    "context": [
+      {
+        "command": "spreadsheet-editor:copy",
+        "selector": ".se-area-container .jexcel",
+        "rank": 0
+      },
+      {
+        "command": "spreadsheet-editor:paste",
+        "selector": ".se-area-container .jexcel",
+        "rank": 1
+      },
+      {
+        "type": "separator",
+        "selector": ".se-area-container .jexcel",
+        "rank": 2
+      },
+      {
+        "command": "spreadsheet-editor:undo",
+        "selector": ".se-area-container",
+        "rank": 3
+      },
+      {
+        "command": "spreadsheet-editor:redo",
+        "selector": ".se-area-container",
+        "rank": 4
+      },
+      {
+        "type": "separator",
+        "selector": ".se-area-container .jexcel td",
+        "rank": 5
+      },
+      {
+        "command": "spreadsheet-editor:insert-row-above",
+        "selector": ".se-area-container .jexcel td[data-y]",
+        "rank": 6
+      },
+      {
+        "command": "spreadsheet-editor:insert-row-below",
+        "selector": ".se-area-container .jexcel td[data-y]",
+        "rank": 7
+      },
+      {
+        "command": "spreadsheet-editor:insert-column-left",
+        "selector": ".se-area-container .jexcel td[data-x]",
+        "rank": 8
+      },
+      {
+        "command": "spreadsheet-editor:insert-column-right",
+        "selector": ".se-area-container .jexcel td[data-x]",
+        "rank": 9
+      },
+      {
+        "type": "separator",
+        "selector": ".se-area-container .jexcel td",
+        "rank": 10
+      },
+      {
+        "command": "spreadsheet-editor:remove-column",
+        "selector": ".se-area-container .jexcel td[data-x]",
+        "rank": 11
+      },
+      {
+        "command": "spreadsheet-editor:remove-row",
+        "selector": ".se-area-container .jexcel td[data-y]",
+        "rank": 12
+      }
+    ]
+  },
+  "type": "object",
+  "properties": {},
+  "additionalProperties": false
+}

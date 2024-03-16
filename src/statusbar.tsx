@@ -48,13 +48,13 @@ export class SelectionStatus extends VDomRenderer<SelectionStatus.Model> {
 
 export namespace SelectionStatus {
   export class Model extends VDomModel {
-    private _spreadsheetWidget: SpreadsheetWidget | null;
+    private _spreadsheetWidget: SpreadsheetWidget | null = null;
 
-    get selection(): ISelection {
+    get selection(): ISelection | undefined {
       return this.spreadsheetWidget?.selection;
     }
 
-    set spreadsheetWidget(widget: SpreadsheetWidget) {
+    set spreadsheetWidget(widget: SpreadsheetWidget | null) {
       if (this._spreadsheetWidget) {
         this._spreadsheetWidget.selectionChanged.disconnect(
           this._triggerChange,
@@ -62,14 +62,16 @@ export namespace SelectionStatus {
         );
       }
       this._spreadsheetWidget = widget;
-      this._spreadsheetWidget.selectionChanged.connect(
-        this._triggerChange,
-        this
-      );
+      if (this._spreadsheetWidget) {
+        this._spreadsheetWidget.selectionChanged.connect(
+          this._triggerChange,
+          this
+        );
+      }
       this._triggerChange();
     }
 
-    get spreadsheetWidget() {
+    get spreadsheetWidget(): SpreadsheetWidget | null {
       return this._spreadsheetWidget;
     }
 

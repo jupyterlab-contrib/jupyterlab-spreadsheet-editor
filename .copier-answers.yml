@@ -1,0 +1,14 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: v4.2.4
+_src_path: https://github.com/jupyterlab/extension-template
+author_email: ''
+author_name: Michał Krassowski
+has_binder: false
+has_settings: true
+kind: frontend
+labextension_name: spreadsheet-editor
+project_short_description: JupyterLab spreadsheet (csv/tsv) editor
+python_name: jupyterlab_spreadsheet_editor
+repository: https://github.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor.git
+test: false
+
