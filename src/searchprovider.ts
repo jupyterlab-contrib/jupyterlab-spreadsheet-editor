@@ -1,17 +1,27 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-import { ISearchMatch, ISearchProvider } from '@jupyterlab/documentsearch';
+import {
+  ISearchMatch,
+  ISearchProvider,
+  ISearchProviderFactory,
+  SearchProvider,
+  IFilters
+} from '@jupyterlab/documentsearch';
 import { SpreadsheetEditorDocumentWidget } from './documentwidget';
 import { Widget } from '@lumino/widgets';
 import { DocumentWidget } from '@jupyterlab/docregistry';
 import { SpreadsheetWidget } from './widget';
 import { ISignal, Signal } from '@lumino/signaling';
-import { JExcelElement } from 'jexcel';
+import { JspreadsheetInstance } from 'jspreadsheet-ce';
 
 export interface ICellCoordinates {
   column: number;
   row: number;
+}
+
+interface ICellSearchMatch extends ISearchMatch, ICellCoordinates {
+  // no-op
 }
 
 class CoordinatesSet {
@@ -63,7 +73,7 @@ class CoordinatesSet {
         return this;
       },
       return(value: any): IteratorResult<ICellCoordinates> {
-        const returned = iterator.return(value);
+        const returned = iterator.return!(value);
         return {
           done: returned.done,
           value: stringToValue(returned.value)
@@ -77,7 +87,7 @@ class CoordinatesSet {
         };
       },
       throw() {
-        const thrown = iterator.throw();
+        const thrown = iterator.throw!();
         return {
           done: thrown.done,
           value: stringToValue(thrown.value)
@@ -91,20 +101,37 @@ class CoordinatesSet {
   }
 }
 
-export class SpreadsheetSearchProvider
-  implements ISearchProvider<SpreadsheetEditorDocumentWidget> {
+export class SpreadsheetSearchProviderFactory
+  implements ISearchProviderFactory<Widget>
+{
+  createNew(
+    widget: Widget
+    //translator?: ITranslator
+  ): ISearchProvider {
+    return new SpreadsheetSearchProvider(
+      widget as SpreadsheetEditorDocumentWidget
+    );
+  }
+
   /**
    * Report whether or not this provider has the ability to search on the given object
    */
-  static canSearchOn(
-    domain: Widget
-  ): domain is SpreadsheetEditorDocumentWidget {
+  isApplicable(domain: Widget): domain is SpreadsheetEditorDocumentWidget {
     // check to see if the SpreadsheetSearchProvider can search on the
     // first cell, false indicates another editor is present
     return (
       domain instanceof DocumentWidget &&
       domain.content instanceof SpreadsheetWidget
     );
+  }
+}
+
+export class SpreadsheetSearchProvider extends SearchProvider<SpreadsheetEditorDocumentWidget> {
+  constructor(widget: SpreadsheetEditorDocumentWidget) {
+    super(widget);
+    this._sheet = widget.content;
+    this._target = this._sheet.jexcel!;
+    this.backlitMatches = new CoordinatesSet();
   }
 
   private mostRecentSelectedCell: any;
@@ -113,22 +140,33 @@ export class SpreadsheetSearchProvider
     return this._changed;
   }
 
-  get currentMatchIndex() {
+  get currentMatchIndex(): number | null {
     return this._currentMatchIndex;
   }
 
-  readonly isReadOnly: boolean;
+  readonly isReadOnly: boolean = false;
 
-  get matches(): ISearchMatch[] {
+  get matches(): ICellSearchMatch[] {
     return this._matches;
+  }
+
+  get matchesCount(): number | null {
+    return this._matches.length;
   }
 
   endQuery(): Promise<void> {
     this.backlightOff();
-    this._currentMatchIndex = null;
+    this._currentMatchIndex = 0;
     this._matches = [];
     this._sheet.changed.disconnect(this._onSheetChanged, this);
     return Promise.resolve(undefined);
+  }
+
+  /**
+   * Clear currently highlighted match.
+   */
+  async clearHighlight(): Promise<void> {
+    this.backlightOff();
   }
 
   private backlightOff() {
@@ -151,22 +189,22 @@ export class SpreadsheetSearchProvider
     return this.endQuery();
   }
 
-  private getSelectedCellCoordinates(): ICellCoordinates {
+  private getSelectedCellCoordinates(): ICellCoordinates | null {
     const target = this._target;
     const columns = target.getSelectedColumns();
-    const rows = target.getSelectedRows(true);
+    const rows = target.getSelectedRows(true) as number[];
     if (rows.length === 1 && columns.length === 1) {
       return {
         column: columns[0],
         row: rows[0]
       };
     }
+    return null;
   }
 
-  private _initialQueryCoodrs: ICellCoordinates;
+  private _initialQueryCoodrs: ICellCoordinates | null = null;
 
-  getInitialQuery(searchTarget: SpreadsheetEditorDocumentWidget): any {
-    this._target = searchTarget.content.jexcel;
+  getInitialQuery(): string {
     const coords = this.getSelectedCellCoordinates();
     this._initialQueryCoodrs = coords;
     if (coords) {
@@ -176,19 +214,19 @@ export class SpreadsheetSearchProvider
         false
       );
       if (value) {
-        return value;
+        return value.toString();
       }
     }
-    return null;
+    return '';
   }
 
-  async highlightNext(): Promise<ISearchMatch | undefined> {
+  async highlightNext(): Promise<ICellSearchMatch | undefined> {
     if (this._currentMatchIndex + 1 < this.matches.length) {
       this._currentMatchIndex += 1;
     } else {
       this._currentMatchIndex = 0;
     }
-    const match = this.matches[this.currentMatchIndex];
+    const match = this.matches[this._currentMatchIndex];
     if (!match) {
       return;
     }
@@ -196,13 +234,13 @@ export class SpreadsheetSearchProvider
     return match;
   }
 
-  async highlightPrevious(): Promise<ISearchMatch | undefined> {
+  async highlightPrevious(): Promise<ICellSearchMatch | undefined> {
     if (this._currentMatchIndex > 0) {
       this._currentMatchIndex -= 1;
     } else {
       this._currentMatchIndex = this.matches.length - 1;
     }
-    const match = this.matches[this.currentMatchIndex];
+    const match = this.matches[this._currentMatchIndex];
     if (!match) {
       return;
     }
@@ -210,20 +248,20 @@ export class SpreadsheetSearchProvider
     return match;
   }
 
-  highlight(match: ISearchMatch) {
+  highlight(match: ICellSearchMatch) {
     this.backlightMatches();
     // select the matched cell, which leads to a loss of "focus" (or rather jexcel eagerly intercepting events)
     this._target.updateSelectionFromCoords(
       match.column,
-      match.line,
+      match.row,
       match.column,
-      match.line,
+      match.row,
       null
     );
     // "regain" focus by erasing selection information (but keeping all the CSS) - this is a workaround (best avoided)
     this.mostRecentSelectedCell = this._target.selectedCell;
     this._target.selectedCell = null;
-    this._sheet.scrollCellIntoView({ row: match.line, column: match.column });
+    this._sheet.scrollCellIntoView({ row: match.row, column: match.column });
   }
 
   async replaceAllMatches(newText: string): Promise<boolean> {
@@ -241,46 +279,43 @@ export class SpreadsheetSearchProvider
     isReplaceAll = false
   ): Promise<boolean> {
     let replaceOccurred = false;
-    const match = this.matches[this.currentMatchIndex];
+    const match = this.matches[this._currentMatchIndex];
     const cell = this._target.getValueFromCoords(
       match.column,
-      match.line,
+      match.row,
       false
     );
     let index = -1;
     let matchesInCell = 0;
 
-    const newValue = String(cell).replace(this._query, substring => {
+    const newValue = String(cell).replace(this._query!, substring => {
       index += 1;
       matchesInCell += 1;
-      if (index === match.index) {
+      if (index === match.position) {
         replaceOccurred = true;
         return newText;
       }
 
       return substring;
     });
-    let subsequentIndex = this.currentMatchIndex + 1;
+    let subsequentIndex = this._currentMatchIndex + 1;
     while (subsequentIndex < this.matches.length) {
       const subsequent = this.matches[subsequentIndex];
-      if (
-        subsequent.column === match.column &&
-        subsequent.line === match.line
-      ) {
-        subsequent.index -= 1;
+      if (subsequent.column === match.column && subsequent.row === match.row) {
+        subsequent.position -= 1;
       } else {
         break;
       }
       subsequentIndex += 1;
     }
 
-    this._target.setValueFromCoords(match.column, match.line, newValue, false);
+    this._target.setValueFromCoords(match.column, match.row, newValue, false);
 
     if (!isReplaceAll && matchesInCell === 1) {
-      const matchCoords = { column: match.column, row: match.line };
+      const matchCoords = { column: match.column, row: match.row };
       const cell: HTMLElement = this._target.getCellFromCoords(
         match.column,
-        match.line
+        match.row
       );
       cell.classList.remove('se-backlight');
       this.backlitMatches.delete(matchCoords);
@@ -316,13 +351,13 @@ export class SpreadsheetSearchProvider
       const match = this.matches[i];
       const matchCoord = {
         column: match.column,
-        row: match.line
+        row: match.row
       };
 
       if (!this.backlitMatches.has(matchCoord)) {
         const cell: HTMLElement = this._target.getCellFromCoords(
           match.column,
-          match.line
+          match.row
         );
         cell.classList.add('se-backlight');
         this.backlitMatches.add(matchCoord);
@@ -330,12 +365,16 @@ export class SpreadsheetSearchProvider
     }
   }
 
-  protected findMatches(highlightFirst = true): ISearchMatch[] {
+  protected findMatches(highlightFirst = true): ICellSearchMatch[] {
     const currentCellCoordinates = this._initialQueryCoodrs;
     this._initialQueryCoodrs = null;
     let currentMatchIndex = 0;
+    const query = this._query;
+    if (!query) {
+      return [];
+    }
 
-    const matches: ISearchMatch[] = [];
+    const matches: ICellSearchMatch[] = [];
     const data = this._target.getData();
     let rowNumber = 0;
     let columnNumber = -1;
@@ -347,14 +386,13 @@ export class SpreadsheetSearchProvider
         if (!cell) {
           continue;
         }
-        const matched = String(cell).match(this._query);
+        const matched = String(cell).match(query!);
         if (!matched) {
           continue;
         }
         index = 0;
         if (
-          // eslint-disable-next-line eqeqeq
-          currentCellCoordinates != null &&
+          currentCellCoordinates !== null &&
           currentCellCoordinates.row === rowNumber &&
           currentCellCoordinates.column === columnNumber
         ) {
@@ -362,10 +400,9 @@ export class SpreadsheetSearchProvider
         }
         for (const match of matched) {
           matches.push({
-            line: rowNumber,
+            row: rowNumber,
             column: columnNumber,
-            index: index,
-            fragment: match,
+            position: index,
             text: match
           });
           index += 1;
@@ -384,34 +421,27 @@ export class SpreadsheetSearchProvider
 
     return matches;
   }
-
-  constructor() {
-    this.backlitMatches = new CoordinatesSet();
-  }
-
-  async startQuery(
-    query: RegExp,
-    searchTarget: SpreadsheetEditorDocumentWidget
-  ): Promise<ISearchMatch[]> {
-    if (!SpreadsheetSearchProvider.canSearchOn(searchTarget)) {
-      throw new Error('Cannot find Spreadsheet editor instance to search');
-    }
+  async startQuery(query: RegExp, filters: IFilters): Promise<void> {
+    console.log('a');
+    const searchTarget = this.widget;
     this._sheet = searchTarget.content;
     this._query = query;
-    this._target = searchTarget.content.jexcel;
     this._target.resetSelection(true);
-    this._target.el.blur();
+
+    this._sheet.node.blur();
+    // TODO
+    //this._target.el.blur();
 
     this._sheet.changed.connect(this._onSheetChanged, this);
 
-    return this.findMatches();
+    this.findMatches();
   }
 
   private _changed = new Signal<this, void>(this);
 
-  private _target: JExcelElement;
+  private _target: JspreadsheetInstance;
   private _sheet: SpreadsheetWidget;
-  private _query: RegExp;
-  private _matches: ISearchMatch[];
-  private _currentMatchIndex: number;
+  private _query: RegExp | null = null;
+  private _matches: ICellSearchMatch[] = [];
+  private _currentMatchIndex: number = 0;
 }

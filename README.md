@@ -1,6 +1,6 @@
 # JupyterLab Spreadsheet Editor
 
-[![Extension status](https://img.shields.io/badge/status-ready-success "ready to be used")](https://jupyterlab-contrib.github.io/)
+[![Extension status](https://img.shields.io/badge/status-ready-success 'ready to be used')](https://jupyterlab-contrib.github.io/)
 [![GitHub Action Status](https://github.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/actions/workflows/build.yml/badge.svg)](https://github.com/jupyterlab-contrib/jupyterlab-spreadsheet-editor/actions/workflows/build.yml)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab-contrib/jupyterlab-spreadsheet-editor/main?urlpath=lab)
 [![pypi-version](https://img.shields.io/pypi/v/jupyterlab-spreadsheet-editor.svg)](https://python.org/pypi/jupyterlab-spreadsheet-editor)
@@ -103,5 +103,6 @@ Spreadsheet viewers:
 - the built-in [csvviewer](https://github.com/jupyterlab/jupyterlab/tree/master/packages/csvviewer) ([extension](https://github.com/jupyterlab/jupyterlab/tree/master/packages/csvviewer-extension)) allows to display CSV/TSV files
 
 In-notebook spreadsheet widgets:
+
 - [ipysheet](https://github.com/QuantStack/ipysheet) - programmable sheet creation, exploration and modification
 - [qgrid](https://github.com/quantopian/qgrid) - interactive DataFrame exploration and modification
