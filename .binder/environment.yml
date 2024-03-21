@@ -2,7 +2,7 @@ name: jupyterlab-spreadsheet-editor
 channels:
   - conda-forge
 dependencies:
-  - python=3.10
-  - jupyterlab >=3,<4.0.0a0
-  - nodejs=14
+  - python=3.11
+  - jupyterlab >=4,<5.0.0a0
+  - nodejs=20
   - pip
