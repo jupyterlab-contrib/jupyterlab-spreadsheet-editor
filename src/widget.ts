@@ -164,6 +164,8 @@ export class SpreadsheetWidget extends Widget {
 
     const options: jspreadsheet.JSpreadsheetOptions = {
       data: data,
+      // Disable export since its shortcut conflicts with JupyterLab's default save shortcut
+      allowExport: false,
       minDimensions: [1, 1],
       // minSpareCols: 1,
       // minSpareRows: 1,
